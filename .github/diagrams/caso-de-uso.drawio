@@ -1,0 +1,140 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="Page-1" id="3ABjhMcGeyEAf8wQrgLq">
+    <mxGraphModel dx="1188" dy="737" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-1" target="3gNTnOg6YzslM7Z_DeRa-21">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="270" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-1" value="USUÁRIO NÃO CADASTRADO" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="160" y="140" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="250" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-5" value="USUÁRIO CADASTRO" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="150" y="360" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-33" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-6" target="3gNTnOg6YzslM7Z_DeRa-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-6" value="ADMIN" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="150" y="570" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-8" target="3gNTnOg6YzslM7Z_DeRa-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-8" value="Acessa o site" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="566.25" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-12" value="Dashboard de gerenciamento de contas" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="630" y="565" width="110" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-13" target="3gNTnOg6YzslM7Z_DeRa-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-13" value="Acessa o site" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="356.25" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-14" target="3gNTnOg6YzslM7Z_DeRa-49">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-14" target="3gNTnOg6YzslM7Z_DeRa-17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-14" value="Tela de Login/Cadastro" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="420" y="356.25" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-16" value="Catalogo de produtos" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="356.25" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-17" value="Perfil de usuário" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="440" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-21" target="3gNTnOg6YzslM7Z_DeRa-53">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-63" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-21" target="3gNTnOg6YzslM7Z_DeRa-62">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-21" target="3gNTnOg6YzslM7Z_DeRa-61">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-21" value="Acessa o site" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="136.25" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-28" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;include&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="335" y="366.25" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-45" target="3gNTnOg6YzslM7Z_DeRa-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-45" value="Tela de Login/Cadastro" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="425" y="566.25" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-49" value="Home de produtos" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="680" y="261.25" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.05;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-14" target="3gNTnOg6YzslM7Z_DeRa-16">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-53" value="Tela de Login/Cadastro" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="231.25" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-54" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="480" y="90" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-56" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="320" y="231.25" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-61" value="Home de produtos" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="555" y="80" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-62" value="Catalogo de produtos" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="555" y="163.75" width="100" height="67.5" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-65" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="610" y="366.25" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-66" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="480" y="171.25" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-67" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="610" y="450" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-68" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="610" y="270" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-70" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="540" y="570" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-71" value="" style="endArrow=none;html=1;rounded=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-45">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="505" y="557.5" as="sourcePoint" />
+            <mxPoint x="600" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-72" value="" style="endArrow=none;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="3gNTnOg6YzslM7Z_DeRa-53">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="490" y="340" as="sourcePoint" />
+            <mxPoint x="600" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-73" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=50;" vertex="1" parent="1">
+          <mxGeometry x="525" y="305" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-74" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;extented&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;rotation=-55;" vertex="1" parent="1">
+          <mxGeometry x="495" y="461.87" width="60" height="23.75" as="geometry" />
+        </mxCell>
+        <mxCell id="3gNTnOg6YzslM7Z_DeRa-76" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;&amp;lt;&amp;lt;include&amp;gt;&amp;gt;&lt;/font&gt;" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="350" y="570" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
