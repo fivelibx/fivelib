@@ -1,150 +1,77 @@
 # DevAcademicX
 
-## Visão Geral
+## 📌 Visão Geral
 
-O **DevAcademicX** é uma plataforma web criada para guiar iniciantes na área de programação.
-O objetivo é centralizar conteúdos essenciais, ferramentas e documentações em um único lugar organizado.
+O **DevAcademicX** (FiveLib) é uma plataforma web projetada para centralizar e organizar conteúdos essenciais para iniciantes na área de programação. O foco é reduzir a sobrecarga de informação, oferecendo um guia estruturado de ferramentas, documentações oficiais e bibliotecas.
 
-A plataforma irá oferecer:
+### Funcionalidades Principais:
 
-* Direcionamento para iniciantes (por onde começar)
-* Explicações de ferramentas importantes (Docker, Git, APIs)
-* Links organizados para documentações oficiais e bibliotecas
-* Sistema de autenticação (login/logout)
-* Sistema de favoritos (salvar conteúdos úteis)
+* **Curadoria Técnica:** Direcionamento para iniciantes e explicações de ferramentas (Docker, Git, APIs).
+* **Hub de Documentação:** Links organizados para fontes oficiais e confiáveis.
+* **Personalização:** Sistema de autenticação para gestão de favoritos e biblioteca pessoal.
 
 ---
 
-## Objetivo do Projeto
+## 🏗️ Arquitetura do Sistema
 
-* Reduzir a confusão de iniciantes
-* Fornecer uma base estruturada de aprendizado
-* Centralizar recursos confiáveis
-* Permitir evolução para web + mobile
+O projeto adota uma abordagem **API-first** com desacoplamento total entre as camadas:
 
----
-
-## Arquitetura
-
-O projeto segue o modelo  **API-first** , com separação entre frontend e backend:
-
-```
-Frontend (Web)  --->  Backend (API)  --->  Banco de Dados
-                         ↑
-                     (Mobile no futuro)
-```
-
-### Decisões principais:
-
-* Frontend e backend desacoplados
-* Backend como fonte principal de dados
-* Preparado para expansão mobile
+- **Frontend (Web):** Consome a API de forma assíncrona.
+- **Backend (API):** Desenvolvido em FastAPI/Python, concentrando toda a lógica de negócio.
+- **Banco de Dados:** PostgreSQL para persistência de usuários, favoritos e metadados.
 
 ---
 
-## Estrutura do Projeto
+## 📁 Estrutura do Repositório
 
-```
+```text
 devacademicx/
-│
-├── backend/                # API principal (FastAPI), contém regras de negócio, autenticação e acesso ao banco
-│   ├── app/                # Código da aplicação (arquitetura em camadas)
-│   ├── tests/              # Testes automatizados
-│   ├── alembic/            # Migrations do banco de dados
-│   ├── requirements.txt    # Dependências do projeto
-│   ├── pyproject.toml      # Configuração do projeto Python
-│   ├── Dockerfile          # Container do backend
-│   └── .env                # Variáveis de ambiente do backend
-│
-├── frontend/               # Aplicação web (interface), consome a API do backend
-│   ├── src/                # Código fonte da interface
-│   ├── public/             # Arquivos estáticos
-│   ├── package.json        # Dependências e scripts do frontend
-│   ├── tsconfig.json       # Configuração do TypeScript
-│   ├── Dockerfile          # Container do frontend
-│   └── .env                # Variáveis de ambiente do frontend
-│
-├── mobile/                 # Aplicação mobile (futuro), usará a mesma API do backend
-│   └── ...
-│
-├── docs/                   # Documentação do projeto (requisitos, arquitetura, API, decisões)
-│   ├── architecture.md     # Estrutura técnica do sistema
-│   ├── api.md              # Endpoints e uso da API
-│   └── adr/                # Decisões arquiteturais registradas
-│
-├── infra/                  # Configuração de infraestrutura e suporte a deploy
-│   ├── nginx/              # Configuração de proxy/rede
-│   │   └── nginx.conf
-│   └── scripts/            # Scripts auxiliares
-│
-├── docker-compose.yml      # Orquestra backend, frontend e banco
-├── .env                    # Variáveis globais
-├── .gitignore              # Arquivos ignorados pelo Git
-├── README.md               # Documentação principal
-└── Makefile                # Atalhos de comandos do projeto
+├── backend/            # API principal (FastAPI), regras de negócio e persistência.
+├── frontend/           # Interface Web (React/Next.js/Vue), consome a API.
+├── docs/               # Documentação técnica organizada por domínios.
+│   ├── requirements/   # PRD, Backlog, Casos de Uso.
+│   ├── architecture/   # ERD, Dicionário de Dados, Contratos de API.
+│   ├── infrastructure/ # Docker, Network, Deploy.
+│   └── dossier-final.pdf
+├── docker-compose.yml  # Orquestração de containers (App + DB).
+├── Makefile            # Atalhos para comandos frequentes do projeto.
+└── README.md           # Guia de entrada do projeto (este arquivo).
 ```
 
 ---
 
-## Backend
+## 📖 Documentação do Projeto
 
-Local: `backend`
+Para uma compreensão detalhada da arquitetura e das regras do  **FiveLib** , acesse os diretórios específicos abaixo:
 
-Responsável por:
-
-* Autenticação
-* Regras de negócio
-* Usuários e favoritos
-* Exposição da API
+* 📂 [Requirements](/docs/requirements): Definição de escopo, regras de negócio (RN), requisitos funcionais (RF/RNF) e diagramas de caso de uso.
+* 📂 [Architecture](/docs/architecture): Modelagem de dados (ERD), Dicionário de Dados, contratos da API (OpenAPI/Swagger) e diagramas estruturais.
+* 📂 [Infrastructure](/docs/infrastructure): Configuração de ambiente Docker, topologia de rede, pipeline de deploy e estratégias de backup.
+* 📄 [Dossier Final](#dossier.md): Compilado completo e definitivo para entrega e auditoria do projeto.
 
 ---
 
-## Frontend
+## 🚀 Como Executar
 
-Local: `frontend`
+O projeto é totalmente conteinerizado via **Docker** para garantir paridade entre os ambientes de desenvolvimento.
 
-Responsável por:
+**Pré-requisitos:** Docker e Docker Compose instalados.
 
-* Interface do usuário
-* Consumo da API
-
----
-
-## Documentação
-
-Documentação detalhada disponível em:
-
-[`docs/requirements.md`](#requirements.md) -> requisitos do sistema (RF, RNF, regras de negócio, casos de uso, fluxos)  
-[`docs/api.md`](#api.md)           -> como consumir a API (endpoints, requests, responses)  
-[`docs/architecture.md`](#arquicture.md)  -> estrutura interna do sistema (arquitetura, camadas, decisões técnicas)  
-[`docs/briefing.md`](#briefing.md)      -> contexto inicial e definições do projeto  
-[`docs/validation.md`](#validation.md)    -> validação dos requisitos ao final do projeto  
-[`docs/adr/`](/docs/adr/)             -> decisões arquiteturais registradas  
-[`docs/diagrams/`](/docs/diagrams)        -> diagramas (arquitetura, fluxo, banco de dados)  
-[`docs/branch.md`](/docs/branch.md)        -> explicação sobre a estrutura da branch do projeto 
-
----
-
-## Como rodar o projeto
+**Bash**
 
 ```
+# Subir todo o ecossistema (Frontend, Backend e Banco de Dados)
 make up
-```
 
-ou
-
-```
+# Caso não possua o Makefile configurado:
 docker-compose up --build
 ```
 
 ---
 
-## Regras do Projeto
+## ⚖️ Diretrizes de Desenvolvimento
 
-* Não misturar frontend com backend
-* Backend deve expor API (sem lógica de interface)
-* Organização por responsabilidade
-* Evitar complexidade desnecessária
-* Manter consistência entre o time
-
----
+* **Decoupling:** Frontend e Backend nunca devem compartilhar lógica direta.
+* **API-Driven:** Toda funcionalidade deve ser exposta via API antes de ser implementada na interface.
+* **Documentation First:** Alterações em banco ou rotas devem ser refletidas no `docs/architecture` antes da implementação em código.
+* **Organizational Flow:** Manter a consistência de nomenclatura conforme o Dicionário de Dados.
