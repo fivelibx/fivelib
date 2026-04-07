@@ -25,12 +25,19 @@ Este diretório centraliza toda a base de conhecimento, especificações e diagr
 * `openapi.yaml` / `api.md`: Especificação técnica dos endpoints e contratos da API.
 * `class-diagram.png`: (Opcional) Detalhamento da lógica de classes interna do sistema.
 
-### 3. [Infrastructure]() (`/infrastructure`)
+### 3. [Infrastructure](/docs/infrastructure/) (`/infrastructure`)
 
 **Foco:** Configuração de ambiente, orquestração de containers e resiliência.
 
 * `infrastructure-diagram.png`: Desenho da rede e dos containers Docker (App e DB).
 * `deployment-pipeline.png`: Visualização do fluxo de integração e entrega contínua (CI/CD). (Ainda está a ser decidido)
+
+### 4. [Internals](/docs/internals/) (`/internals`)
+
+**Foco:** Governança do repositório, processos do time e gestão de tarefas.
+
+* `workflow.md`: Guia de comandos Git, Docker e fluxo de Branches (o "Como fazer").
+* `projects.md`: Manual do GitHub Projects, uso de labels, status e sub-issues (o "Como organizar").
 
 ---
 
