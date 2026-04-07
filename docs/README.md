@@ -1,47 +1,40 @@
-# Documentação
+# 📂 Documentação Técnica - FiveLib
 
-Esta pasta contém os documentos que descrevem o sistema em nível funcional e técnico.
-O objetivo é centralizar informações importantes para entendimento, desenvolvimento e manutenção do projeto.
-
----
-
-## Estrutura
-
-```
-docs/
-├── requirements.md
-├── architecture.md
-├── api.md
-├── briefing.md
-├── validation.md
-├── diagrams/
-└── adr/
-```
+Este diretório centraliza toda a base de conhecimento, especificações e diagramas do projeto. A estrutura segue o ciclo de vida de desenvolvimento, desde a concepção até a estratégia de entrega final.
 
 ---
 
-## Descrição dos Arquivos
+## 🧭 Estrutura de Diretórios
 
-* **requirements.md** → Define o que o sistema deve fazer (requisitos funcionais, não funcionais, regras de negócio, casos de uso e fluxos).
+### 1. [Requirements](/docs/requirements) (`/requirements`)
 
-* **architecture.md** → Descreve como o sistema é estruturado internamente (camadas, organização e decisões técnicas).
+**Foco:** Definição de escopo, regras de negócio e visão do produto.
 
-* **api.md** → Documenta como utilizar a API (endpoints, formatos de requisição e resposta).
+* `PRD.pdf`: Documento de requisitos do produto (O norteador do projeto).
+* `product-backlog.md`: Lista priorizada de funcionalidades e  *User Stories* .
+* `use-case-diagram.png`: Representação visual das interações dos atores com o sistema.
+* `user-flow-map.png`: Mapeamento do caminho lógico do usuário dentro da plataforma.
 
-* **briefing.md** → Registra o contexto inicial do projeto e decisões tomadas no início.
+### 2. [Architecture](/docs/architecture) (`/architecture`)
 
-* **validation.md** → Verifica se os requisitos definidos foram atendidos ao longo do desenvolvimento.
+**Foco:** Estruturação técnica, modelagem de dados e contratos de interface.
+
+* `high-level-architecture.png`: Diagrama macro da comunicação entre Frontend, Backend e Banco de Dados.
+* `erd-diagram.png`: Modelo Entidade-Relacionamento do banco de dados PostgreSQL.
+* `data-dictionary.md`: Dicionário técnico detalhando tipos, restrições e indexadores.
+* `openapi.yaml` / `api.md`: Especificação técnica dos endpoints e contratos da API.
+* `class-diagram.png`: (Opcional) Detalhamento da lógica de classes interna do sistema.
+
+### 3. [Infrastructure]() (`/infrastructure`)
+
+**Foco:** Configuração de ambiente, orquestração de containers e resiliência.
+
+* `infrastructure-diagram.png`: Desenho da rede e dos containers Docker (App e DB).
+* `deployment-pipeline.png`: Visualização do fluxo de integração e entrega contínua (CI/CD). (Ainda está a ser decidido)
 
 ---
 
-## Pastas
+## 📄 Arquivos Globais (`/docs`)
 
-* **diagrams/** → Contém diagramas do sistema (arquitetura, fluxo de usuário, modelo de dados).
-
-* **adr/** → Registros de decisões arquiteturais (motivo das escolhas técnicas do projeto).
-
----
-
-## Observação
-
-Esta documentação deve ser mantida atualizada conforme o projeto evolui.
+* **`dossier-final.pdf`** : Compilado geral e definitivo do projeto para entrega e auditoria.
+* **`README.md`** : Este guia de navegação da documentação.
