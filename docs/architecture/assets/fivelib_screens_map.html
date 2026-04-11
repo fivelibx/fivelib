@@ -1,0 +1,646 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.app { padding: 1rem 0; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.tab { padding: 6px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 13px; cursor: pointer; background: var(--color-background-primary); color: var(--color-text-secondary); transition: all .15s; }
+.tab.active { background: var(--color-background-tertiary); color: var(--color-text-primary); border-color: var(--color-border-primary); font-weight: 500; }
+.tab:hover:not(.active) { background: var(--color-background-secondary); }
+.screen { display: none; }
+.screen.active { display: block; }
+
+.screen-card { border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; background: var(--color-background-primary); margin-bottom: 1.5rem; }
+.screen-header { padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: center; gap: 12px; }
+.screen-badge { font-size: 11px; padding: 2px 8px; border-radius: var(--border-radius-md); font-weight: 500; }
+.badge-visitor { background: var(--color-background-info); color: var(--color-text-info); }
+.badge-user { background: var(--color-background-success); color: var(--color-text-success); }
+.badge-admin { background: var(--color-background-warning); color: var(--color-text-warning); }
+.screen-meta { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; }
+.screen-title { font-size: 15px; font-weight: 500; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+.meta-col { padding: 1rem 1.25rem; border-right: 0.5px solid var(--color-border-tertiary); }
+.wire-col { padding: 1rem 1.25rem; background: var(--color-background-secondary); }
+.meta-section { margin-bottom: 1rem; }
+.meta-label { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; }
+.tag { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 20px; margin: 2px; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.tag.entity { border-color: var(--color-border-info); background: var(--color-background-info); color: var(--color-text-info); }
+.tag.action { border-color: var(--color-border-success); background: var(--color-background-success); color: var(--color-text-success); }
+.meta-text { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; }
+
+/* Wireframe styles */
+.wire { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 10px; font-size: 11px; color: var(--color-text-secondary); }
+.wire-nav { background: var(--color-background-secondary); border-radius: 4px; padding: 6px 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--color-text-secondary); }
+.wire-nav-logo { font-weight: 500; color: var(--color-text-primary); font-size: 12px; }
+.wire-nav-links { display: flex; gap: 8px; margin-left: auto; }
+.wire-nav-link { font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 0.5px solid var(--color-border-tertiary); }
+.wire-hero { background: var(--color-background-tertiary); border-radius: 4px; padding: 16px 10px; text-align: center; margin-bottom: 8px; }
+.wire-hero-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; }
+.wire-search { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 4px; padding: 5px 8px; width: 100%; font-size: 10px; color: var(--color-text-tertiary); margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+.wire-btn { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: 4px; padding: 3px 8px; font-size: 10px; display: inline-block; }
+.wire-btn.primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.wire-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 6px; }
+.wire-card { background: var(--color-background-secondary); border-radius: 4px; padding: 8px; }
+.wire-card-title { font-size: 10px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+.wire-card-sub { font-size: 9px; color: var(--color-text-tertiary); }
+.wire-card-tag { font-size: 9px; display: inline-block; padding: 1px 4px; border-radius: 3px; background: var(--color-background-info); color: var(--color-text-info); margin-top: 3px; }
+.wire-form { margin-top: 6px; }
+.wire-field { margin-bottom: 5px; }
+.wire-field-label { font-size: 9px; color: var(--color-text-secondary); margin-bottom: 2px; }
+.wire-field-input { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 3px; padding: 4px 6px; width: 100%; font-size: 9px; color: var(--color-text-tertiary); }
+.wire-sidebar { display: grid; grid-template-columns: 110px 1fr; gap: 6px; }
+.wire-sidebar-nav { background: var(--color-background-secondary); border-radius: 4px; padding: 6px; }
+.wire-sidebar-item { font-size: 9px; padding: 4px 6px; border-radius: 3px; margin-bottom: 2px; color: var(--color-text-secondary); }
+.wire-sidebar-item.active-item { background: var(--color-background-tertiary); color: var(--color-text-primary); font-weight: 500; }
+.wire-list { display: flex; flex-direction: column; gap: 4px; }
+.wire-list-item { background: var(--color-background-secondary); border-radius: 4px; padding: 6px 8px; display: flex; align-items: center; gap: 6px; }
+.wire-list-star { color: var(--color-text-warning); font-size: 11px; }
+.wire-list-info { flex: 1; }
+.wire-list-title { font-size: 10px; font-weight: 500; color: var(--color-text-primary); }
+.wire-list-sub { font-size: 9px; color: var(--color-text-tertiary); }
+.wire-table { width: 100%; font-size: 10px; border-collapse: collapse; margin-top: 6px; }
+.wire-table th { background: var(--color-background-secondary); padding: 4px 6px; text-align: left; font-size: 9px; color: var(--color-text-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); }
+.wire-table td { padding: 4px 6px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); }
+.wire-status { display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px; }
+.status-pending { background: var(--color-background-warning); color: var(--color-text-warning); }
+.status-analysis { background: var(--color-background-info); color: var(--color-text-info); }
+.status-resolved { background: var(--color-background-success); color: var(--color-text-success); }
+
+/* Flow diagram */
+.flow-wrap { padding: 0.5rem 0; }
+.flow-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 8px; font-weight: 500; }
+.flow-row { display: flex; align-items: center; gap: 0; flex-wrap: nowrap; overflow-x: auto; }
+.flow-node { border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 7px 12px; font-size: 12px; background: var(--color-background-primary); white-space: nowrap; cursor: pointer; transition: background .12s; }
+.flow-node:hover { background: var(--color-background-secondary); }
+.flow-node.highlight { border-color: var(--color-border-info); background: var(--color-background-info); color: var(--color-text-info); }
+.flow-arrow { font-size: 14px; color: var(--color-text-tertiary); padding: 0 6px; flex-shrink: 0; }
+.flow-branch { display: flex; flex-direction: column; gap: 4px; }
+.flow-branch-row { display: flex; align-items: center; gap: 0; }
+.flow-note { font-size: 10px; color: var(--color-text-tertiary); padding: 0 6px; }
+
+@media (max-width: 500px) {
+  .two-col { grid-template-columns: 1fr; }
+  .meta-col { border-right: none; border-bottom: 0.5px solid var(--color-border-tertiary); }
+}
+</style>
+
+<div class="app">
+  <h2 style="sr-only">Mapeamento de telas FiveLib</h2>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" onclick="showScreen('home')">T1 Home</button>
+    <button class="tab" onclick="showScreen('search')">T2 Busca</button>
+    <button class="tab" onclick="showScreen('tool')">T3 Ferramenta</button>
+    <button class="tab" onclick="showScreen('login')">T4 Login</button>
+    <button class="tab" onclick="showScreen('register')">T5 Cadastro</button>
+    <button class="tab" onclick="showScreen('profile')">T6 Perfil</button>
+    <button class="tab" onclick="showScreen('support')">T7 Suporte</button>
+    <button class="tab" onclick="showScreen('admin')">T8 Admin</button>
+    <button class="tab" onclick="showScreen('flow')">Fluxo</button>
+  </div>
+
+  <!-- T1 HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="screen-title">T1 — Landing Page / Home</span>
+            <span class="screen-badge badge-visitor">Visitante</span>
+            <span class="screen-badge badge-user">Registrado</span>
+          </div>
+          <div class="screen-meta">Ponto de entrada do sistema · RF01, RF05</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="meta-col">
+          <div class="meta-section">
+            <div class="meta-label">Objetivo</div>
+            <div class="meta-text">Apresentar o sistema, dar acesso ao motor de busca global e orientar o visitante ao cadastro ou login.</div>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Entidades exibidas</div>
+            <span class="tag entity">Tool (lista/destaques)</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos exibidos</div>
+            <span class="tag">tool.nome</span><span class="tag">tool.linguagem</span><span class="tag">tool.descricao</span><span class="tag">tool.url_oficial</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Ações disponíveis</div>
+            <span class="tag action">Buscar ferramenta</span><span class="tag action">Filtrar por linguagem</span><span class="tag action">Ir para Login</span><span class="tag action">Ir para Cadastro</span><span class="tag action">Ver detalhes (T3)</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Regras de negócio</div>
+            <div class="meta-text">Sem autenticação para visualizar. Ações de favoritar exigem login (RF02/RNF02).</div>
+          </div>
+        </div>
+        <div class="wire-col">
+          <div class="wire">
+            <div class="wire-nav">
+              <span class="wire-nav-logo">FiveLib</span>
+              <div class="wire-nav-links">
+                <span class="wire-nav-link">Explorar</span>
+                <span class="wire-nav-link">Login</span>
+                <span class="wire-nav-link primary" style="background:var(--color-text-primary);color:var(--color-background-primary);border-color:var(--color-text-primary)">Cadastrar</span>
+              </div>
+            </div>
+            <div class="wire-hero">
+              <div class="wire-hero-title">Encontre bibliotecas e frameworks</div>
+              <div class="wire-search">
+                <span style="font-size:10px">🔍</span>
+                <span>Buscar por nome, linguagem ou categoria...</span>
+              </div>
+              <div style="display:flex;gap:4px;justify-content:center;margin-top:4px">
+                <span class="wire-btn">Python</span><span class="wire-btn">JavaScript</span><span class="wire-btn">Rust</span><span class="wire-btn">Java</span>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:4px">Destaques</div>
+            <div class="wire-grid">
+              <div class="wire-card"><div class="wire-card-title">React</div><div class="wire-card-sub">Biblioteca UI para web</div><span class="wire-card-tag">JavaScript</span></div>
+              <div class="wire-card"><div class="wire-card-title">FastAPI</div><div class="wire-card-sub">Framework web para Python</div><span class="wire-card-tag">Python</span></div>
+              <div class="wire-card"><div class="wire-card-title">Tokio</div><div class="wire-card-sub">Runtime assíncrono</div><span class="wire-card-tag">Rust</span></div>
+              <div class="wire-card"><div class="wire-card-title">Spring Boot</div><div class="wire-card-sub">Framework Java</div><span class="wire-card-tag">Java</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T2 BUSCA -->
+  <div class="screen" id="screen-search">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="screen-title">T2 — Resultados de Busca</span>
+            <span class="screen-badge badge-visitor">Visitante</span>
+            <span class="screen-badge badge-user">Registrado</span>
+          </div>
+          <div class="screen-meta">Motor de busca global · RF01, RNF04</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="meta-col">
+          <div class="meta-section">
+            <div class="meta-label">Objetivo</div>
+            <div class="meta-text">Exibir resultados filtrados por nome, linguagem ou categoria. Resposta deve ser &lt; 10s (RNF04).</div>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Entidades exibidas</div>
+            <span class="tag entity">Tool (lista filtrada)</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos exibidos</div>
+            <span class="tag">tool.nome</span><span class="tag">tool.descricao</span><span class="tag">tool.linguagem</span><span class="tag">tool.url_oficial</span><span class="tag">tool.status_ativo</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Ações disponíveis</div>
+            <span class="tag action">Refinar busca</span><span class="tag action">Favoritar (requer login)</span><span class="tag action">Ver detalhes (→ T3)</span><span class="tag action">Reportar link (→ T7)</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Regras de negócio</div>
+            <div class="meta-text">Ferramentas com status_ativo = false podem exibir aviso "Link inativo". Favoritar redireciona para T4 se não logado.</div>
+          </div>
+        </div>
+        <div class="wire-col">
+          <div class="wire">
+            <div class="wire-nav"><span class="wire-nav-logo">FiveLib</span><div class="wire-nav-links"><span class="wire-nav-link">Login</span><span class="wire-nav-link">Cadastrar</span></div></div>
+            <div class="wire-search" style="margin-bottom:6px"><span>🔍</span><span style="color:var(--color-text-primary)">react</span></div>
+            <div style="display:flex;gap:4px;margin-bottom:6px">
+              <span class="wire-btn">Todos</span><span class="wire-btn">JavaScript</span><span class="wire-btn">Python</span>
+            </div>
+            <div style="font-size:10px;color:var(--color-text-tertiary);margin-bottom:4px">12 resultados para "react"</div>
+            <div class="wire-list">
+              <div class="wire-list-item"><div class="wire-list-info"><div class="wire-list-title">React ·<span style="font-size:9px;padding:1px 4px;background:var(--color-background-info);color:var(--color-text-info);border-radius:3px;margin-left:3px">JavaScript</span></div><div class="wire-list-sub">Biblioteca para construção de interfaces de usuário</div></div><span class="wire-btn">★</span></div>
+              <div class="wire-list-item"><div class="wire-list-info"><div class="wire-list-title">React Native ·<span style="font-size:9px;padding:1px 4px;background:var(--color-background-info);color:var(--color-text-info);border-radius:3px;margin-left:3px">JavaScript</span></div><div class="wire-list-sub">Apps móveis com React</div></div><span class="wire-btn">★</span></div>
+              <div class="wire-list-item" style="opacity:.6"><div class="wire-list-info"><div class="wire-list-title">React Router <span style="font-size:9px;padding:1px 4px;background:var(--color-background-danger);color:var(--color-text-danger);border-radius:3px;margin-left:3px">⚠ Inativo</span></div><div class="wire-list-sub">Roteamento para React</div></div><span class="wire-btn">⚑</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T3 FERRAMENTA -->
+  <div class="screen" id="screen-tool">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="screen-title">T3 — Detalhe da Ferramenta</span>
+            <span class="screen-badge badge-visitor">Visitante</span>
+            <span class="screen-badge badge-user">Registrado</span>
+          </div>
+          <div class="screen-meta">Página de detalhes de uma tool · RF01, RF02, RF03</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="meta-col">
+          <div class="meta-section">
+            <div class="meta-label">Objetivo</div>
+            <div class="meta-text">Exibir informações completas da ferramenta, permitir favoritar e reportar link quebrado.</div>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Entidades exibidas</div>
+            <span class="tag entity">Tool</span><span class="tag entity">Favorite (contagem)</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos exibidos</div>
+            <span class="tag">tool.nome</span><span class="tag">tool.descricao</span><span class="tag">tool.linguagem</span><span class="tag">tool.url_oficial</span><span class="tag">tool.status_ativo</span><span class="tag">favorite.adicionado_at</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Ações disponíveis</div>
+            <span class="tag action">Favoritar / Desfavoritar</span><span class="tag action">Acessar URL oficial</span><span class="tag action">Reportar link quebrado (→ T7)</span><span class="tag action">Voltar à busca</span>
+          </div>
+        </div>
+        <div class="wire-col">
+          <div class="wire">
+            <div class="wire-nav"><span class="wire-nav-logo">FiveLib</span><span style="font-size:10px;color:var(--color-text-tertiary)">← Voltar aos resultados</span></div>
+            <div style="padding:8px 0">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="font-size:13px;font-weight:500;color:var(--color-text-primary)">React</span>
+                <span style="font-size:9px;padding:1px 5px;background:var(--color-background-info);color:var(--color-text-info);border-radius:3px">JavaScript</span>
+                <span style="font-size:9px;padding:1px 5px;background:var(--color-background-success);color:var(--color-text-success);border-radius:3px">● Ativo</span>
+              </div>
+              <div style="font-size:10px;color:var(--color-text-secondary);margin-bottom:8px;line-height:1.5">Uma biblioteca declarativa, eficiente e flexível para construir interfaces de usuário.</div>
+              <div style="display:flex;gap:5px;margin-bottom:8px">
+                <span class="wire-btn primary">★ Favoritar</span>
+                <span class="wire-btn">↗ Documentação oficial</span>
+                <span class="wire-btn">⚑ Reportar link</span>
+              </div>
+              <div style="font-size:9px;color:var(--color-text-tertiary)">247 usuários favoritaram esta ferramenta</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T4 LOGIN -->
+  <div class="screen" id="screen-login">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="screen-title">T4 — Login</span>
+            <span class="screen-badge badge-visitor">Visitante</span>
+          </div>
+          <div class="screen-meta">Autenticação · RF05, RNF02</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="meta-col">
+          <div class="meta-section">
+            <div class="meta-label">Objetivo</div>
+            <div class="meta-text">Autenticar usuário cadastrado para desbloquear funcionalidades personalizadas (favoritos, links privados).</div>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Entidades envolvidas</div>
+            <span class="tag entity">User</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos do formulário</div>
+            <span class="tag">user.email</span><span class="tag">user.senha</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Ações disponíveis</div>
+            <span class="tag action">Entrar</span><span class="tag action">Ir para Cadastro (→ T5)</span><span class="tag action">Esqueci minha senha</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Regras de negócio</div>
+            <div class="meta-text">Autenticação via e-mail (RNF02). Sessão encerrada via logout (RF05). Redireciona para perfil após login.</div>
+          </div>
+        </div>
+        <div class="wire-col">
+          <div class="wire" style="max-width:260px;margin:0 auto">
+            <div style="text-align:center;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">FiveLib</div>
+              <div style="font-size:10px;color:var(--color-text-secondary)">Acesse sua conta</div>
+            </div>
+            <div class="wire-form">
+              <div class="wire-field"><div class="wire-field-label">E-mail</div><div class="wire-field-input">seu@email.com</div></div>
+              <div class="wire-field"><div class="wire-field-label">Senha</div><div class="wire-field-input">••••••••</div></div>
+              <div class="wire-btn primary" style="width:100%;text-align:center;margin-top:8px;padding:6px">Entrar</div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-size:9px;color:var(--color-text-tertiary)">Não tem conta? <span style="color:var(--color-text-info)">Cadastrar</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T5 CADASTRO -->
+  <div class="screen" id="screen-register">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="screen-title">T5 — Cadastro</span>
+            <span class="screen-badge badge-visitor">Visitante</span>
+          </div>
+          <div class="screen-meta">Registro de novo usuário · RF05, RN01, RN02</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="meta-col">
+          <div class="meta-section">
+            <div class="meta-label">Objetivo</div>
+            <div class="meta-text">Registrar novo usuário com validação de idade mínima (18 anos, RN01) e unicidade de e-mail (RN02).</div>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Entidades envolvidas</div>
+            <span class="tag entity">User</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos do formulário</div>
+            <span class="tag">user.nome</span><span class="tag">user.email</span><span class="tag">user.senha</span><span class="tag">user.data_nascimento</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Ações disponíveis</div>
+            <span class="tag action">Criar conta</span><span class="tag action">Ir para Login (→ T4)</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Regras de negócio</div>
+            <div class="meta-text">data_nascimento deve garantir ≥ 18 anos (RN01). E-mail deve ser único no sistema (RN02). Senha armazenada como hash.</div>
+          </div>
+        </div>
+        <div class="wire-col">
+          <div class="wire" style="max-width:260px;margin:0 auto">
+            <div style="text-align:center;margin-bottom:10px">
+              <div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">Criar conta</div>
+              <div style="font-size:10px;color:var(--color-text-secondary)">Apenas maiores de 18 anos</div>
+            </div>
+            <div class="wire-form">
+              <div class="wire-field"><div class="wire-field-label">Nome completo</div><div class="wire-field-input">Seu nome</div></div>
+              <div class="wire-field"><div class="wire-field-label">E-mail</div><div class="wire-field-input">seu@email.com</div></div>
+              <div class="wire-field"><div class="wire-field-label">Data de nascimento</div><div class="wire-field-input">DD/MM/AAAA</div></div>
+              <div class="wire-field"><div class="wire-field-label">Senha</div><div class="wire-field-input">••••••••</div></div>
+              <div class="wire-btn primary" style="width:100%;text-align:center;margin-top:8px;padding:6px">Criar conta</div>
+            </div>
+            <div style="text-align:center;margin-top:8px;font-size:9px;color:var(--color-text-tertiary)">Já tem conta? <span style="color:var(--color-text-info)">Entrar</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T6 PERFIL -->
+  <div class="screen" id="screen-profile">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="screen-title">T6 — Biblioteca Pessoal (Perfil)</span>
+            <span class="screen-badge badge-user">Registrado</span>
+          </div>
+          <div class="screen-meta">Painel do usuário autenticado · RF02, RF04, RN03</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="meta-col">
+          <div class="meta-section">
+            <div class="meta-label">Objetivo</div>
+            <div class="meta-text">Exibir e gerenciar favoritos e links privados do usuário. Dados visíveis apenas pelo proprietário (RN03).</div>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Entidades exibidas</div>
+            <span class="tag entity">User</span><span class="tag entity">Favorite</span><span class="tag entity">PrivateLink</span><span class="tag entity">Tool (via Favorite)</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos exibidos</div>
+            <span class="tag">user.nome</span><span class="tag">user.email</span><span class="tag">user.perfil</span><span class="tag">favorite.adicionado_at</span><span class="tag">tool.nome</span><span class="tag">private_link.titulo</span><span class="tag">private_link.url</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Ações disponíveis</div>
+            <span class="tag action">Ver favoritos</span><span class="tag action">Remover favorito</span><span class="tag action">Adicionar link privado</span><span class="tag action">Editar / Excluir link privado</span><span class="tag action">Fazer logout</span>
+          </div>
+        </div>
+        <div class="wire-col">
+          <div class="wire">
+            <div class="wire-nav"><span class="wire-nav-logo">FiveLib</span><div class="wire-nav-links"><span class="wire-nav-link">Explorar</span><span class="wire-nav-link">Sair</span></div></div>
+            <div class="wire-sidebar">
+              <div class="wire-sidebar-nav">
+                <div style="font-size:10px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px;padding:0 6px">João Silva</div>
+                <div class="wire-sidebar-item active-item">★ Favoritos</div>
+                <div class="wire-sidebar-item">🔗 Links privados</div>
+                <div class="wire-sidebar-item">👤 Minha conta</div>
+              </div>
+              <div>
+                <div style="font-size:10px;font-weight:500;color:var(--color-text-primary);margin-bottom:6px">Meus favoritos</div>
+                <div class="wire-list">
+                  <div class="wire-list-item"><span class="wire-list-star">★</span><div class="wire-list-info"><div class="wire-list-title">React</div><div class="wire-list-sub">Salvo em 05/04/2026</div></div><span class="wire-btn">✕</span></div>
+                  <div class="wire-list-item"><span class="wire-list-star">★</span><div class="wire-list-info"><div class="wire-list-title">FastAPI</div><div class="wire-list-sub">Salvo em 08/04/2026</div></div><span class="wire-btn">✕</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T7 SUPORTE -->
+  <div class="screen" id="screen-support">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="screen-title">T7 — Formulário de Suporte</span>
+            <span class="screen-badge badge-user">Registrado</span>
+          </div>
+          <div class="screen-meta">Reporte de problemas e links quebrados · RF03, RN01, RN04</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="meta-col">
+          <div class="meta-section">
+            <div class="meta-label">Objetivo</div>
+            <div class="meta-text">Permitir que o usuário reporte links quebrados ou problemas. Ticket criado com status "Pendente" automaticamente (RN04).</div>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Entidades envolvidas</div>
+            <span class="tag entity">SupportTicket</span><span class="tag entity">User</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos do formulário</div>
+            <span class="tag">ticket.email_contato</span><span class="tag">ticket.mensagem</span><span class="tag">ticket.secao_site</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos gerados automaticamente</div>
+            <span class="tag">ticket.usuario_id</span><span class="tag">ticket.status = "Pendente"</span><span class="tag">ticket.criado_at</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Ações disponíveis</div>
+            <span class="tag action">Enviar formulário</span><span class="tag action">Cancelar</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Regras de negócio</div>
+            <div class="meta-text">Restrito a usuários ≥ 18 anos (RN01). Status sempre inicia como "Pendente" (RN04).</div>
+          </div>
+        </div>
+        <div class="wire-col">
+          <div class="wire" style="max-width:260px;margin:0 auto">
+            <div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:8px">Reportar problema</div>
+            <div class="wire-form">
+              <div class="wire-field"><div class="wire-field-label">Seção do site onde o problema ocorreu</div><div class="wire-field-input">ex: página de busca</div></div>
+              <div class="wire-field"><div class="wire-field-label">E-mail para contato</div><div class="wire-field-input">seu@email.com</div></div>
+              <div class="wire-field"><div class="wire-field-label">Descreva o problema</div><div class="wire-field-input" style="height:50px;padding-top:4px">Descreva o link quebrado ou o problema encontrado...</div></div>
+              <div style="display:flex;gap:5px;margin-top:8px">
+                <span class="wire-btn" style="flex:1;text-align:center">Cancelar</span>
+                <span class="wire-btn primary" style="flex:1;text-align:center">Enviar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- T8 ADMIN -->
+  <div class="screen" id="screen-admin">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="screen-title">T8 — Painel Administrativo</span>
+            <span class="screen-badge badge-admin">Admin</span>
+          </div>
+          <div class="screen-meta">Gestão de tickets e moderação · RN04, UC03, UC04</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="meta-col">
+          <div class="meta-section">
+            <div class="meta-label">Objetivo</div>
+            <div class="meta-text">Visualizar tickets com status "Pendente", alterar status, banir/restringir usuários (UC03/UC04).</div>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Entidades exibidas</div>
+            <span class="tag entity">SupportTicket</span><span class="tag entity">User</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Campos exibidos</div>
+            <span class="tag">ticket.id</span><span class="tag">ticket.email_contato</span><span class="tag">ticket.mensagem</span><span class="tag">ticket.secao_site</span><span class="tag">ticket.status</span><span class="tag">ticket.criado_at</span><span class="tag">user.nome</span><span class="tag">user.perfil</span>
+          </div>
+          <div class="meta-section">
+            <div class="meta-label">Ações disponíveis</div>
+            <span class="tag action">Filtrar por status</span><span class="tag action">Mudar status do ticket</span><span class="tag action">Banir usuário (UC03)</span><span class="tag action">Restringir usuário (UC04)</span><span class="tag action">Ativar/desativar tool</span>
+          </div>
+        </div>
+        <div class="wire-col">
+          <div class="wire">
+            <div class="wire-nav"><span class="wire-nav-logo">FiveLib Admin</span><div class="wire-nav-links"><span class="wire-nav-link">Tickets</span><span class="wire-nav-link">Usuários</span><span class="wire-nav-link">Sair</span></div></div>
+            <div style="display:flex;gap:4px;margin-bottom:6px">
+              <span class="wire-btn">Todos</span>
+              <span class="wire-btn" style="background:var(--color-background-warning);color:var(--color-text-warning);border-color:var(--color-border-warning)">● Pendente (5)</span>
+              <span class="wire-btn">Em análise</span>
+              <span class="wire-btn">Resolvido</span>
+            </div>
+            <table class="wire-table">
+              <thead><tr><th>ID</th><th>Seção</th><th>Status</th><th>Data</th><th>Ação</th></tr></thead>
+              <tbody>
+                <tr><td>#42</td><td>Busca</td><td><span class="wire-status status-pending">Pendente</span></td><td>09/04</td><td><span class="wire-btn" style="font-size:9px;padding:1px 4px">Analisar</span></td></tr>
+                <tr><td>#41</td><td>Perfil</td><td><span class="wire-status status-analysis">Em análise</span></td><td>08/04</td><td><span class="wire-btn" style="font-size:9px;padding:1px 4px">Resolver</span></td></tr>
+                <tr><td>#40</td><td>Home</td><td><span class="wire-status status-resolved">Resolvido</span></td><td>07/04</td><td><span class="wire-btn" style="font-size:9px;padding:1px 4px">Ver</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLUXO -->
+  <div class="screen" id="screen-flow">
+    <div class="screen-card">
+      <div class="screen-header">
+        <div>
+          <span class="screen-title">Fluxo de Navegação entre Telas</span>
+          <div class="screen-meta">Jornada do Visitante → Registrado → Admin</div>
+        </div>
+      </div>
+      <div style="padding:1rem 1.25rem">
+        <div class="flow-wrap">
+          <div class="flow-label">Jornada principal (visitante → persistência)</div>
+          <div class="flow-row">
+            <div class="flow-node highlight" onclick="showScreen('home');setTab('home')">T1 Home</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('search');setTab('search')">T2 Busca</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('tool');setTab('tool')">T3 Detalhe</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('login');setTab('login')">T4 Login</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('profile');setTab('profile')">T6 Perfil</div>
+          </div>
+        </div>
+        <div class="flow-wrap" style="margin-top:1rem">
+          <div class="flow-label">Cadastro de novo usuário</div>
+          <div class="flow-row">
+            <div class="flow-node" onclick="showScreen('home');setTab('home')">T1 Home</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('register');setTab('register')">T5 Cadastro</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('login');setTab('login')">T4 Login</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('profile');setTab('profile')">T6 Perfil</div>
+          </div>
+        </div>
+        <div class="flow-wrap" style="margin-top:1rem">
+          <div class="flow-label">Reporte de link quebrado</div>
+          <div class="flow-row">
+            <div class="flow-node" onclick="showScreen('tool');setTab('tool')">T3 Detalhe</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('support');setTab('support')">T7 Suporte</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('admin');setTab('admin')">T8 Admin</div>
+            <div class="flow-note">(admin visualiza)</div>
+          </div>
+        </div>
+        <div class="flow-wrap" style="margin-top:1rem">
+          <div class="flow-label">Fluxo administrativo</div>
+          <div class="flow-row">
+            <div class="flow-node" onclick="showScreen('login');setTab('login')">T4 Login</div>
+            <div class="flow-note">(admin)</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node" onclick="showScreen('admin');setTab('admin')">T8 Painel Admin</div>
+            <div class="flow-note">gerencia tickets, usuários, tools</div>
+          </div>
+        </div>
+        <div style="margin-top:1.5rem;border-top:0.5px solid var(--color-border-tertiary);padding-top:1rem">
+          <div class="flow-label" style="margin-bottom:10px">Resumo — entidades por tela</div>
+          <table class="wire-table" style="width:100%">
+            <thead><tr><th>Tela</th><th>Ator</th><th>Entidades</th><th>Req.</th></tr></thead>
+            <tbody>
+              <tr><td>T1 Home</td><td>Visitante / User</td><td>Tool</td><td>RF01, RF05</td></tr>
+              <tr><td>T2 Busca</td><td>Visitante / User</td><td>Tool</td><td>RF01, RNF04</td></tr>
+              <tr><td>T3 Detalhe</td><td>Visitante / User</td><td>Tool, Favorite</td><td>RF01, RF02, RF03</td></tr>
+              <tr><td>T4 Login</td><td>Visitante</td><td>User</td><td>RF05, RNF02</td></tr>
+              <tr><td>T5 Cadastro</td><td>Visitante</td><td>User</td><td>RF05, RN01, RN02</td></tr>
+              <tr><td>T6 Perfil</td><td>User Registrado</td><td>User, Favorite, PrivateLink, Tool</td><td>RF02, RF04, RN03</td></tr>
+              <tr><td>T7 Suporte</td><td>User Registrado</td><td>SupportTicket, User</td><td>RF03, RN01, RN04</td></tr>
+              <tr><td>T8 Admin</td><td>Admin</td><td>SupportTicket, User, Tool</td><td>RN04, UC03, UC04</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+}
+function setTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.tab');
+  const map = ['home','search','tool','login','register','profile','support','admin','flow'];
+  const idx = map.indexOf(id);
+  if (idx >= 0) tabs[idx].classList.add('active');
+}
+</script>
