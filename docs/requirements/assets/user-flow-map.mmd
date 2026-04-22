@@ -1,0 +1,97 @@
+---
+config:
+  layout: elk
+---
+flowchart TB
+ subgraph Visitante["Visitante"]
+        Busca{"Realiza Busca?"}
+        Home["Home: Busca Pública"]
+        Navega["Navega por Categorias"]
+        Resultados["Lista de Resultados"]
+        VerDet["Ver Detalhes da Lib"]
+        FavCheck{"Tenta Favoritar?"}
+        LogCheck{"Está Logado?"}
+        Redirect["Prompt: Login Necessário"]
+  end
+ subgraph Autenticacao["Autenticacao"]
+        Login{"Possui Conta?"}
+        Credenciais{"Credenciais Válidas?"}
+        Cadastro["Form de Cadastro"]
+        Sucesso["Conta Criada"]
+  end
+ subgraph Usuario_Logado["Usuario_Logado"]
+        Dash["Dashboard: Minha Biblioteca"]
+        Opcoes{"Ações"}
+        AddPriv["Add Link Privado RF04"]
+        VerFav["Ver Favoritos RF02"]
+        Report["Reportar Link RF03"]
+        IdadeCheck{"Maior de 18? RN01"}
+        AbreFormReport["Abre Formulário de Reporte"]
+        BloqueioReport(("Acesso Negado: Apenas +18"))
+        Suporte["Enviar SupportTicket"]
+        URLCheck{"URL Válida?"}
+        LinkSalvo["Link Privado Ativo"]
+        IdadeRestricao{"Usuário ≥ 18?"}
+        TicketEnviado["Ticket Enviado"]
+        BloqSuporte(("Acesso Negado: RN02"))
+  end
+ subgraph Administrador["Administrador"]
+        Fila["Fila de Moderação"]
+        Analise{"Link Realmente Quebrado?"}
+        Remove["Remove/Corrige Link"]
+        Mantem["Descarta Reporte"]
+        Notifica(("Notifica Reporter"))
+  end
+    Start(("Acesso ao FiveLib")) --> Home
+    Home --> Busca
+    Busca -- Não --> Navega
+    Busca -- Sim --> Resultados
+    Resultados --> VerDet
+    VerDet --> FavCheck
+    FavCheck -- Sim --> LogCheck
+    LogCheck -- Não --> Redirect
+    Redirect --> Login
+    Login -- Sim --> Credenciais
+    Credenciais -.-> Login
+    Login -- Não --> Cadastro
+    Cadastro --> Sucesso
+    Sucesso --> Dash
+    Credenciais -- Sim --> Dash
+    Dash --> Opcoes
+    Opcoes --> AddPriv & VerFav & Report & Suporte
+    AddPriv --> URLCheck
+    URLCheck -.-> AddPriv
+    URLCheck -- Sim --> LinkSalvo
+
+    %% Nova regra RN01 aplicada ao fluxo de REPORTAR LINK
+    Report --> IdadeCheck
+    IdadeCheck -- Não --> BloqueioReport
+    IdadeCheck -- Sim --> AbreFormReport
+    AbreFormReport --> Fila
+
+    Suporte --> IdadeRestricao
+    IdadeRestricao -- Sim --> TicketEnviado
+    IdadeRestricao -- Não --> BloqSuporte
+
+    Fila --> Analise
+    Analise -- Sim --> Remove
+    Analise -- Não --> Mantem
+    Remove --> Notifica
+    Mantem --> Notifica
+
+     Resultados:::happy
+     LogCheck:::logic
+     Redirect:::sad
+     Credenciais:::logic
+     Sucesso:::happy
+     LinkSalvo:::happy
+     IdadeCheck:::logic
+     AbreFormReport:::happy
+     BloqueioReport:::sad
+     IdadeRestricao:::logic
+     TicketEnviado:::happy
+     BloqSuporte:::sad
+     Analise:::logic
+    classDef happy fill:#e1f5ee,stroke:#1d9e75,stroke-width:2px
+    classDef sad fill:#fcebeb,stroke:#e24b4a,stroke-width:2px
+    classDef logic fill:#faeeda,stroke:#ba7517
