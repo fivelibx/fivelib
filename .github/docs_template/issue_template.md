@@ -14,6 +14,8 @@
 - Documento: [Link ou nome do arquivo, ex: PRD.md]
 - Diagrama: [Link ou nome, ex: erd-diagram.png]
 
+
+
 ---
 
 ### **Issue 00 (Retroativa): Documento de Engenharia e Casos de Uso**
@@ -29,6 +31,27 @@ Consolidar a base teórica e funcional do projeto no repositório.
 * [X] Subir `PRD.pdf` oficial para a pasta `/docs`.
 * [X] (Sub-issue) Finalizar e anexar `use-case-diagram.png`.
 * [X] Validar requisitos e atores com a equipe.
+
+## 🔗 Referências
+
+* Documento: `PRD.pdf`
+* Diagrama: `use-case-diagram.png`
+
+---
+
+### **Issue 00.1: Mapeamento de Experiência do Usuário (User Flow)**
+
+**Tags:** `documentation`, `ux`
+
+## 📝 Resumo
+
+Desenvolver o mapa lógico que descreve o caminho do usuário desde o acesso até o objetivo final.
+
+## 🎯 Objetivo
+
+* [ ] Criar `user-flow-map.png` detalhando o fluxo de busca de ferramentas.
+* [ ] Mapear o fluxo de erro (Login inválido, link quebrado).
+* [ ] Validar se o fluxo condiz com os Requisitos Funcionais (RF).
 
 ## 🔗 Referências
 
@@ -58,6 +81,27 @@ Finalizar a estrutura lógica do banco de dados e sua documentação técnica.
 
 ---
 
+### **Issue 01.1: Documentação Técnica de Arquitetura (High-Level & Class)**
+
+**Tags:** `documentation`, `architecture`
+
+## 📝 Resumo
+
+Visualizar a comunicação entre os serviços e a estrutura interna das classes.
+
+## 🎯 Objetivo
+
+* [ ] Criar `high-level-architecture.png` (Comunicação React <-> FastAPI <-> Postgres).
+* [ ] (Opcional) Desenvolver `class-diagram.png` para a lógica de Domínio no Backend.
+* [ ] Explicar a escolha da Stack (Vite, FastAPI, Docker).
+
+## 🔗 Referências
+
+* Documento: `data-dictionary.md`
+* Issue Dependente: `Issue 07.1` (Setup Backend)
+
+---
+
 ### **Issue 02: Identidade Visual e Prototipação (DESIGN.md)**
 
 **Tags:** `documentation`, `enhancement`
@@ -75,6 +119,8 @@ Definir a guia de estilo e o esqueleto visual das telas principais.
 ## 🔗 Referências
 
 * Documento: `PRD.pdf` (Seção 8 - Fluxos)
+
+---
 
 ### Issue 02.1 — Criação do Pitch Deck para Apresentação do Projeto
 
@@ -168,6 +214,26 @@ Padronizar o ambiente de execução para todos os membros da equipe.
 
 * Documento: `README.md` (Draft)
 * Requisito: `RNF05` (PRD)
+
+---
+
+### **Issue 04.1: Diagramação de Infraestrutura e Redes**
+
+**Tags:** `infrastructure`, `documentation`
+
+## 📝 Resumo
+
+Documentar visualmente como os containers Docker se comunicam e como o sistema será orquestrado.
+
+## 🎯 Objetivo
+
+* [ ] Criar `infrastructure-diagram.png` (Redes do Docker e Volumes).
+* [ ] Definir o desenho do `deployment-pipeline.png` (GitHub Actions -> Render/Vercel).
+
+## 🔗 Referências
+
+* Documento: `docker-compose.yml`
+* Issue Dependente: `Issue 04`
 
 ---
 
@@ -385,3 +451,24 @@ Revisão final do fluxo do usuário para garantir que não haja erros durante a 
 ## 🔗 Referências
 
 * Documento: `PRD.md` (Validação de Requisitos Funcionais)
+
+---
+
+### **Issue 14: Compilação do Dossier Final**
+
+**Tags:** `documentation`, `management`
+
+## 📝 Resumo
+
+Consolidar toda a documentação, diagramas e códigos em um único documento oficial para a banca.
+
+## 🎯 Objetivo
+
+* [ ] Gerar o `dossier-final.pdf` unindo PRD, Arquitetura e Resultados.
+* [ ] Revisar todos os links no `README.md` principal.
+* [ ] Garantir que o repositório esteja limpo e organizado para auditoria.
+
+## 🔗 Referências
+
+* Documento: Todos os arquivos da pasta `/docs`.
+* Prazo Final: Data da entrega final do projeto.

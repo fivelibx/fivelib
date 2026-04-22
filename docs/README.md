@@ -11,7 +11,7 @@ Este diretório centraliza toda a base de conhecimento, especificações e diagr
 **Foco:** Definição de escopo, regras de negócio e visão do produto.
 
 * `PRD.pdf`: Documento de requisitos do produto (O norteador do projeto).
-* `product-backlog.md`: Lista priorizada de funcionalidades e  *User Stories* .
+* `backlog.md`: Lista priorizada de funcionalidades e  *User Stories* .
 * `use-case-diagram.png`: Representação visual das interações dos atores com o sistema.
 * `user-flow-map.png`: Mapeamento do caminho lógico do usuário dentro da plataforma.
 
