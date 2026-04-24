@@ -1,4 +1,6 @@
 notes.md
-.vite/
-__pycache__/
+
 .env
+__pycache__/
+.pytest_cache/
+.venv/
