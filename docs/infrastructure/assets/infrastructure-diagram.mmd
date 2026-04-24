@@ -1,0 +1,56 @@
+%%{init: {'theme': 'base', 'themeVariables': { 
+  'primaryColor': '#f5f5f5', 
+  'primaryBorderColor': '#ccc', 
+  'tertiaryColor': '#ffffff',
+  'edgeLabelBackground':'#ffffff',
+  'fontSize': '14px',
+  'fontFamily': 'Inter, Arial, sans-serif'
+}}}%%
+graph TD
+    %% Layout e classes
+    classDef cloud fill:#f0f9ff,stroke:#38bdf8,color:#111,stroke-width:1.5px;
+    classDef service fill:#fdf4ff,stroke:#e879f9,color:#111;
+    classDef storage fill:#f0fdf4,stroke:#4ade80,color:#111,rx:8,ry:8;
+    classDef network fill:#fff,stroke:#94a3b8,color:#111,stroke-dasharray: 5 3;
+
+    %% Usuário
+    User["👤 Usuário<br/>(Browser)"]
+
+    %% Vercel
+    subgraph Vercel_Cloud ["Vercel — Frontend"]
+        direction TB
+        F_Static["📦 Arquivos Estáticos<br/>(React / Vite)"]
+        F_Edge["⚡ Edge Network<br/>(CDN)"]
+        F_Static --> F_Edge
+    end
+
+    %% Render
+    subgraph Render_Cloud ["Render — Backend"]
+        direction TB
+        subgraph Docker_Container ["🐳 Docker Container"]
+            B_API["🚀 FastAPI App"]
+            B_Alembic["🛠️ Alembic<br/>(Migrations)"]
+        end
+        B_Vol["💾 Volume — Alembic Versions"]
+        B_Net["🌐 docker-network (bridge)"]
+        B_API --> B_Net
+        B_Alembic --> B_Net
+        B_Alembic --> B_Vol
+    end
+
+    %% Supabase
+    subgraph Supabase_Cloud ["Supabase — Data"]
+        direction TB
+        S_Postgres["🐘 PostgreSQL Database"]
+    end
+
+    %% Fluxo
+    User -->|"HTTPS / VITE_API_URL"| F_Edge
+    F_Edge -->|"HTTP Requests"| B_API
+    B_API -->|"SQL / DATABASE_URL"| S_Postgres
+
+    %% Classes
+    class Vercel_Cloud,Render_Cloud,Supabase_Cloud cloud;
+    class F_Static,F_Edge,B_API,B_Alembic service;
+    class S_Postgres,B_Vol storage;
+    class B_Net network;

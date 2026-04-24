@@ -1,0 +1,71 @@
+%%{init: {'theme': 'base', 'themeVariables': {
+  'primaryColor': '#f5f5f5',
+  'primaryBorderColor': '#ccc',
+  'tertiaryColor': '#fff',
+  'edgeLabelBackground':'#ffffff',
+  'fontFamily': 'Inter, Arial, sans-serif',
+  'fontSize': '14px'
+}}}%%
+graph LR
+    %% Define estilos para os nodes
+    classDef git fill:#fef2f2,stroke:#f87171,stroke-width:2px,color:#111;
+    classDef action fill:#f0f9ff,stroke:#38bdf8,stroke-width:2px,color:#111,rx:6,ry:6;
+    classDef provider fill:#f5f3ff,stroke:#a78bfa,stroke-width:2px,color:#111;
+    classDef success fill:#f0fdf4,stroke:#4ade80,color:#111,stroke-width:2px;
+
+    %% Fase de Desenvolvimento
+    subgraph Dev ["🛠️ Desenvolvimento"]
+        D_Code["💻 Developer Code"]
+    end
+
+    %% Repositório Central
+    subgraph GitHub_Repo ["🐙 GitHub Repository"]
+        direction TB
+        G_Repo["fivelib<br/>(Main / Develop)"]
+        G_Config["⚙️ .github/workflows/*.yml"]
+    end
+
+    %% Pipeline de CI/CD
+    subgraph GA_Workflow ["🤖 GitHub Actions (CI/CD)"]
+        direction TB
+        GA_Trigger{{"on: push"}}
+
+        %% Job: Frontend
+        subgraph Job_Frontend ["Job — Deploy Frontend"]
+            direction TB
+            JF_Build["Node Build (Vite)"]
+            JF_Deploy["Deploy to Vercel"]
+            JF_Build --> JF_Deploy
+        end
+
+        %% Job: Backend
+        subgraph Job_Backend ["Job — Deploy Backend"]
+            direction TB
+            JB_Build["Docker Build & Push"]
+            JB_Deploy["Deploy to Render"]
+            JB_Alembic["Run Alembic Migrations"]
+            JB_Build --> JB_Deploy --> JB_Alembic
+        end
+
+        GA_Trigger ==> Job_Frontend
+        GA_Trigger ==> Job_Backend
+    end
+
+    %% Ambientes de Produção
+    subgraph Production ["🌐 Produção"]
+        direction TB
+        P_Vercel["⚡ Vercel Live App"]
+        P_Render["🚀 Render Live API"]
+    end
+
+    %% Fluxo CI/CD
+    D_Code -->|"git push"| G_Repo
+    G_Repo -->|"webhook"| GA_Trigger
+    JF_Deploy -->|"Frontend Artifact"| P_Vercel
+    JB_Alembic -->|"Backend Success"| P_Render
+
+    %% Aplicação de classes
+    class G_Repo,G_Config git;
+    class GA_Trigger,JF_Build,JF_Deploy,JB_Build,JB_Deploy,JB_Alembic action;
+    class P_Vercel,P_Render provider;
+    class Job_Frontend,Job_Backend success;
