@@ -14,8 +14,6 @@
 - Documento: [Link ou nome do arquivo, ex: PRD.md]
 - Diagrama: [Link ou nome, ex: erd-diagram.png]
 
-
-
 ---
 
 ### **Issue 00 (Retroativa): Documento de Engenharia e Casos de Uso**
@@ -257,46 +255,67 @@ Configurar as regras de contribuição e fluxo de branches no GitHub.
 
 ---
 
-### **Issue 06: Setup da Arquitetura Frontend (React + Tailwind)**
+### **Issue 06: Adoção da Base Next.js e Configuração de Ambiente**
 
-**Tags:** `frontend`, `setup`, `enhancement`
+**Tags:** `frontend`, `setup`, `nextjs`
 
 ## 📝 Resumo
 
-Inicializar o projeto Frontend com React e configurar o Tailwind CSS para estilização padronizada.
+Consolidar a estrutura gerada pelo v0.dev, limpar dependências não utilizadas e configurar a comunicação com o Backend via variáveis de ambiente.
 
 ## 🎯 Objetivo
 
-* [ ] Criar o diretório base `/frontend` no repositório (depende da Issue 05).
-* [ ] Inicializar o projeto React (Vite/CRA).
-* [ ] Instalar e configurar o Tailwind CSS e suas diretivas.
-* [ ] Definir a estrutura inicial de pastas (ex: `/components`, `/pages`, `/assets`).
+* [ ] Mudar o prefixo da variável de API no frontend (Criar `.env.local` com `NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1`).
+* [ ] Adicionar a prop `suppressHydrationWarning` na tag `<html>` no `app/layout.tsx` para evitar erros de extensão de navegador.
+* [ ] Criar a pasta `frontend/services/` para isolar as chamadas `fetch()` para a API.
 
 ## 🔗 Referências
 
-* Documento: `DESIGN.md` (Para variáveis de cores no `tailwind.config.js`)
+* Documento: `PROVISIONING.md`
+* Diagrama: `infrastructure-diagram.png`
 
 ---
 
-### **Issue 07: Desenvolvimento da Interface de Autenticação (Estático)**
+### **Issue 06.1: Integração do Módulo de Busca (Consumo da API)**
 
-**Tags:** `frontend`, `ui`
+**Tags:** `frontend`, `integration`, `high-priority`
 
 ## 📝 Resumo
 
-Desenvolver a estrutura visual e os componentes estáticos para as telas de Login e Registro.
+Substituir os dados estáticos (`mockLibraries`) da página de busca por dados reais consumidos do endpoint `/resources` do FastAPI.
 
 ## 🎯 Objetivo
 
-* [ ] Criar componente base de formulário de Login.
-* [ ] Criar componente base de formulário de Registro (Sign Up).
-* [ ] Aplicar estilização responsiva utilizando Tailwind CSS.
-* [ ] Garantir fidelidade visual com os mockups aprovados.
+* [ ] Criar a função `getResources()` no diretório `services/api.ts` utilizando `fetch` nativo.
+* [ ] No arquivo `app/busca/page.tsx`, remover o array `mockLibraries`.
+* [ ] Implementar um `useEffect` (ou transformar a página em Server Component) para carregar os dados reais na variável de estado que alimenta a listagem.
+* [ ] Garantir que o componente `Card` (`frontend/components/ui/card.tsx`) renderize as informações vindas do Supabase.
 
 ## 🔗 Referências
 
-* Design: Wireframes de T2 (Login) e Registro (Mapeamento de telas)
-* Issue Dependente: `Issue 06` (Setup do Tailwind)
+* Documento: `api.md` (Contrato da API)
+* Arquivo Alvo: `frontend/app/busca/page.tsx`
+
+---
+
+### **Issue 07: Integração de Autenticação e Gestão de Sessão (Frontend)**
+
+**Tags:** `frontend`, `security`, `auth`
+
+## 📝 Resumo
+
+Conectar o formulário estático de Login/Cadastro (gerado pelo v0) ao endpoint de autenticação do FastAPI e gerenciar o Token JWT no Next.js.
+
+## 🎯 Objetivo
+
+* [ ] Criar função de submissão no formulário de `app/login/page.tsx` apontando para `POST /auth/login`.
+* [ ] Armazenar o token JWT retornado pela API de forma segura (Cookies ou LocalStorage).
+* [ ] Configurar os botões do cabeçalho (`Header`) para mudarem de "Login" para "Meu Perfil" caso o usuário esteja autenticado.
+* [ ] Redirecionar para o `/dashboard` em caso de sucesso.
+
+## 🔗 Referências
+
+* Documento: `api.md` (RF05, RN01)
 
 ---
 
@@ -349,67 +368,85 @@ Configurar o SQLAlchemy, conectar o FastAPI ao PostgreSQL e criar as tabelas bas
 
 ---
 
-### **Issue 09: Desenvolvimento dos Endpoints (CRUD da API)**
+### **Issue 08.1: Gestão de Migrações (Alembic) e Carga Inicial (Seeding)**
 
-**Tags:** `backend`, `api`, `feature`
+**Tags:** `backend`, `database`, `setup`
 
 ## 📝 Resumo
 
-Implementar a lógica de negócio (Controllers/Services) e liberar as rotas no FastAPI.
+Configurar o versionamento do banco de dados com Alembic e popular a tabela de ferramentas com dados reais para permitir os testes de integração.
 
 ## 🎯 Objetivo
 
-* [ ] Criar rotas de Autenticação (Login/Registro).
-* [ ] Criar rotas de listagem e busca de bibliotecas.
-* [ ] Criar rotas para salvar e gerenciar links favoritos (RN03 - Privacidade).
-* [ ] Validar payload de entrada usando Pydantic.
+* [ ] Configurar o `alembic.ini` e o `env.py` para lerem a `DATABASE_URL` do `.env`.
+* [ ] Gerar a primeira migração (Revision) baseada nos modelos do SQLAlchemy (`alembic revision --autogenerate`).
+* [ ] Aplicar a migração no Supabase (`alembic upgrade head`).
+* [ ] Criar um script de "Seed" (ex: `seed.py` ou via DBeaver/SQL) para inserir as ferramentas iniciais (React, Docker, FastAPI, etc.) direto no banco, substituindo a necessidade do mock no frontend.
 
 ## 🔗 Referências
 
-* Documento: `api.md` (Contrato da API)
-* Issue Dependente: `Issue 03` e `Issue 08`
+* Documento: `data-dictionary.md`
+* Issue Dependente: `Issue 08`
 
 ---
 
-### **Issue 10: Desenvolvimento da Interface Principal (Home/Dashboard)**
+### **Issue 09: [EPIC] Desenvolvimento dos Endpoints da API (Backend)**
 
-**Tags:** `frontend`, `ui`
+**Tags:** `backend`, `epic`
 
 ## 📝 Resumo
 
-Construir a interface principal onde o usuário fará a busca e visualizará as bibliotecas cadastradas.
+Issue de gestão para o desenvolvimento da camada de API (Controllers/Services) no FastAPI. Todas as tarefas de implementação de rotas devem ser vinculadas a esta Epic.
 
 ## 🎯 Objetivo
 
-* [ ] Criar o layout da Home (Sidebar, Barra de Busca, Grid de Cards).
-* [ ] Criar o componente de Card para exibir cada ferramenta/biblioteca.
-* [ ] Adicionar estados estáticos para simular o filtro de busca.
-
-## 🔗 Referências
-
-* Design: Wireframes T1 (Home) e T6 (Busca)
-* Issue Dependente: `Issue 06`
+* [ ] Implementar autenticação (Login/Registro).
+* [ ] Implementar listagem e busca de bibliotecas.
+* [ ] Implementar persistência de favoritos.
+* [ ] Validar todos os payloads de entrada.
 
 ---
 
-### **Issue 11: Integração Frontend x API (Consumo de Dados)**
+### **Issue 09.1: Implementação do Endpoint GET /resources**
 
-**Tags:** `frontend`, `integration`
+**Tags:** `backend`, `api`, `task`
 
 ## 📝 Resumo
 
-Conectar o React ao backend FastAPI usando Axios para dar vida às telas.
+Criar a rota de listagem de ferramentas no FastAPI para alimentar a página de busca do Frontend.
 
 ## 🎯 Objetivo
 
-* [ ] Integrar fluxo de Login/Registro para receber o Token JWT.
-* [ ] Salvar o estado de autenticação (Context API ou Zustand/LocalStorage).
-* [ ] Fazer o fetch das bibliotecas na Home com base no banco de dados.
-* [ ] Integrar a função de "Favoritar" ferramenta.
+* [ ] Implementar a rota `GET /api/v1/resources` em `backend/api/routes/resources.py`.
+* [ ] Criar o schema Pydantic de resposta (`ResourceResponse`) com `id`, `name`, `description`, `language`, `category`, `stars` e `tags`.
+* [ ] Realizar a consulta via SQLAlchemy na tabela `Tool`.
+* [ ] Testar via Swagger (`/docs`).
 
 ## 🔗 Referências
 
-* Issue Dependente: `Issue 07`, `Issue 09` e `Issue 10`
+* Documento: `api.md`
+* Issue Dependente: `Issue 08` (Banco de Dados populado)
+
+---
+
+### **Issue 09.2: Implementação da Autenticação (Auth)**
+
+**Tags:** `backend`, `api`, `task`
+
+## 📝 Resumo
+
+Criar os endpoints de registro e login, implementando a lógica de geração de tokens JWT.
+
+## 🎯 Objetivo
+
+* [ ] Criar `POST /auth/register` (com validação de maioridade - RN01).
+* [ ] Criar `POST /auth/login` (retorno de token Bearer).
+* [ ] Configurar injeção de dependência para verificar o token nas rotas protegidas.
+
+## 🔗 Referências
+
+* Documento: `api.md` (Seção 1)
+* Issue Dependente: `Issue 08`
 
 ---
 
@@ -454,21 +491,111 @@ Revisão final do fluxo do usuário para garantir que não haja erros durante a 
 
 ---
 
+
+### **Issue 13.1: Implementação de Testes Automatizados (Backend)**
+
+**Tags:** `backend`, `testing`, `quality-assurance`
+
+## 📝 Resumo
+
+Garantir a confiabilidade da API através de testes automatizados que validem as regras de negócio e a integridade dos endpoints.
+
+## 🎯 Objetivo
+
+* [ ] Configurar o framework `pytest` e `httpx` no ambiente backend.
+* [ ] Criar testes unitários para validar a lógica de negócio principal (Ex: Validação de maioridade na regra RN01).
+* [ ] Criar testes de integração para os endpoints da API (verificar se `GET /resources` retorna status 200 e a estrutura correta de JSON).
+* [ ] Configurar um job simples no GitHub Actions para rodar esses testes automaticamente a cada `push` na branch `develop`.
+
+## 🔗 Referências
+
+* Documento: `api.md` (Contrato da API)
+* Issue Dependente: `Issue 07.1` (Setup Backend) e `Issue 09` (Endpoints)
+
+---
+
 ### **Issue 14: Compilação do Dossier Final**
 
 **Tags:** `documentation`, `management`
 
 ## 📝 Resumo
 
-Consolidar toda a documentação, diagramas e códigos em um único documento oficial para a banca.
+Consolidar toda a documentação, diagramas e códigos em um único conjunto de entrega oficial para a banca examinadora, garantindo um repositório limpo e profissional.
 
 ## 🎯 Objetivo
 
-* [ ] Gerar o `dossier-final.pdf` unindo PRD, Arquitetura e Resultados.
-* [ ] Revisar todos os links no `README.md` principal.
-* [ ] Garantir que o repositório esteja limpo e organizado para auditoria.
+* [ ] **Unificação de Documentos:** Gerar o `dossier-final.pdf` (ou organizar a pasta `/docs` de forma que o sumário no `README.md` guie a banca).
+* [ ] **Limpeza de Repositório:** Remover arquivos temporários, logs, comentários desnecessários no código e garantir que não haja linguagem sentimental (corações, mensagens informais) em rodapés ou commits.
+* [ ] **Revisão de Links:** Verificar se todos os links internos no `README.md` (diagramas, documentos, link do deploy online) estão funcionando.
+* [ ] **Finalização do README:** Garantir que o `README.md` principal conte a história do projeto e contenha o guia "Como Rodar" (Docker/Compose).
 
 ## 🔗 Referências
 
 * Documento: Todos os arquivos da pasta `/docs`.
 * Prazo Final: Data da entrega final do projeto.
+
+---
+
+### **Issue 15 (Opcional): Painel Administrativo de Recursos**
+
+**Tags:** `frontend`, `backend`, `admin`
+
+## 📝 Resumo
+
+Criar uma interface administrativa protegida para gestão de bibliotecas (CRUD completo) sem depender do banco de dados direto.
+
+## 🎯 Objetivo
+
+* [ ] Criar a rota protegida `POST/PUT/DELETE /api/v1/admin/resources` no FastAPI (validar `role=admin` no token).
+* [ ] Criar a página `/admin` no Next.js com formulário de cadastro/edição de ferramentas.
+* [ ] Garantir que apenas usuários autenticados com cargo "admin" acessem essa rota.
+
+## 🔗 Referências
+
+* Issue Dependente: `Issue 09` e `Issue 07`
+
+
+Aqui estão as duas novas issues para completar o seu planejamento. Elas garantem tanto a proteção legal do seu projeto quanto a integridade técnica da documentação, especialmente importante após a refatoração para Next.js.
+
+---
+
+### **Issue 16: Licenciamento do Projeto (Legal)**
+
+**Tags:** `legal`, `documentation`
+
+## 📝 Resumo
+
+Definir e implementar a licença de uso do código-fonte para proteger a propriedade intelectual e orientar colaboradores.
+
+## 🎯 Objetivo
+
+* [ ] Escolher uma licença adequada para o projeto (Ex: MIT para permissividade total ou GPL para copyleft).
+* [ ] Criar o arquivo `LICENSE` na raiz do repositório.
+* [ ] Incluir um aviso de copyright no cabeçalho dos arquivos principais (opcional, mas recomendado).
+* [ ] Atualizar o `README.md` com um selo de licença visível.
+
+## 🔗 Referências
+
+* Documento: `README.md`
+
+---
+
+### **Issue 17: Atualização Técnica da Arquitetura do Frontend**
+
+**Tags:** `documentation`, `frontend`, `refactoring`
+
+## 📝 Resumo
+
+Atualizar a documentação do projeto para refletir a mudança de arquitetura do Frontend para Next.js, garantindo que o desenho técnico condiga com o código atual.
+
+## 🎯 Objetivo
+
+* [ ] Atualizar o diagrama `high-level-architecture.png` para refletir o SSR/SSG do Next.js.
+* [ ] Revisar o `PROVISIONING.md` e o `README.md` para remover referências à estrutura antiga.
+* [ ] Adicionar uma breve nota técnica no `README` explicando o porquê da escolha do Next.js (Performance e SEO).
+* [ ] Garantir que o fluxograma de telas esteja alinhado com a estrutura de rotas do App Router do Next.js.
+
+## 🔗 Referências
+
+* Documento: `Issue 06` (Adoção da Base Next.js)
+* Diagrama: `high-level-architecture.png`
