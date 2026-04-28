@@ -1,29 +1,44 @@
-#### **Milestone 01: Alicerce e Infraestrutura**
 
-* **Entregas:**
-  * Consolidação do Documento de Visão e Especificação de Requisitos.
-  * Modelagem Lógica do banco de dados (DER) e Dicionário de Dados.
-  * Identidade visual e prototipação das interfaces (T1 a T8).
-  * Configuração inicial do repositório e regras de contribuição da equipe.
+# Roadmap FiveLib v1.0.0
 
-#### **Milestone 02: Desenvolvimento do Backend e Banco de Dados**
+Este documento define o plano de entrega do FiveLib. O objetivo é a conclusão de todas as etapas técnicas, documentais e comerciais necessárias para a versão estável v1.0.0.
 
-* **Entregas:**
-  * Configuração do ambiente de desenvolvimento isolado via contêineres.
-  * Estruturação da API em camadas (Domínio, Serviço e Repositórios).
-  * Criação e documentação dos endpoints principais.
-  * Implementação da persistência de dados.
+## Fase 1: Fundação e Estrutura
 
-#### **Milestone 03: Integração da Interface e Frontend**
+*Foco: Estabelecer as bases documentais e arquiteturais do repositório.*
 
-* **Entregas:**
-  * Construção das telas baseadas nos protótipos validados.
-  * Conexão das telas com a API para exibição dinâmica das ferramentas.
-  * Aplicação prática das regras de negócio na interface (ex: bloqueio de favoritos sem login).
+* **Governança e Legal:** Configuração das regras de contribuição, Branch Protection e implementação da licença de uso (Issues 05, 16).
+* **Documentação e Design:** Finalização do PRD, User Flow, Guia de Estilo (DESIGN.md) e atualização da arquitetura técnica após migração para Next.js (Issues 00, 00.1, 02, 17).
+* **Modelagem:** Finalização do DER, dicionário de dados e diagramas de classe/arquitetura (Issues 01, 01.1).
 
-#### **Milestone 04: Homologação e Lançamento**
+## Fase 2: Infraestrutura e Backend Core
 
-* **Entregas:**
-  * Testes de integração e validação de usabilidade.
-  * Refinamento final de performance.
-  * Entrega da versão funcional para uso e avaliação.
+*Foco: Preparação do ambiente de execução e contratos de dados.*
+
+* **Ambiente:** Setup do ambiente Docker, orquestração de redes e persistência de dados (Issues 04, 04.1).
+* **Contratos:** Definição final dos endpoints da API (`api.md`) (Issue 03).
+* **Backend Base:** Implementação da arquitetura em camadas, setup do ORM (SQLAlchemy) e migrações (Alembic) (Issues 07.1, 08, 08.1).
+* **Seed:** Carga inicial de dados para validação da plataforma (Issue 08.1).
+
+## Fase 3: Desenvolvimento e Integração
+
+*Foco: Construção das funcionalidades e consumo de API.*
+
+* **Backend:** Implementação dos serviços e endpoints de Auth, Busca e Recursos (Issues 09, 09.1, 09.2).
+* **Frontend:** Adoção da base Next.js, estruturação dos serviços de API e integração dos componentes de busca e autenticação (Issues 06, 06.1, 07).
+
+## Fase 4: Validação, Negócio e Entrega
+
+*Foco: Qualidade, estratégia comercial e lançamento.*
+
+* **Estratégia:** Apresentação do Pitch Deck, modelo de negócio e precificação (Issues 02.1, 02.2).
+* **Qualidade:** Implementação de testes automatizados (Backend) e QA do fluxo completo do usuário (Issues 13, 13.1).
+* **Administração:** Implementação opcional do painel de controle administrativo (Issue 15).
+* **Deploy:** Configuração da infraestrutura de produção e deploy final (Issue 12).
+* **Encerramento:** Compilação do dossiê final, higienização do repositório e entrega oficial (Issue 14).
+
+---
+
+### Meta: Lançamento v1.0.0
+
+A versão 1.0.0 será marcada pela estabilidade da API, interface funcional, deploy acessível ao público e documentação técnica completa.
