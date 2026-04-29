@@ -2,13 +2,13 @@
 
 <div align="center">
 <br/>
-  <a href="#">
-      <img alt="Website" src="https://img.shields.io/badge/website-green?labelColor=404040&color=353535&style=for-the-badge&logo=vercel&logoColor=white" href="https://fivelib.vercel.app">
+  <a href="https://fivelib.vercel.app/">
+      <img alt="Website" src="https://img.shields.io/badge/website-green?labelColor=404040&color=353535&style=for-the-badge&logo=vercel&logoColor=white" href="https://fivelib.vercel.app/">
   </a>
-  <a href="./docs/architecture">
+  <a href="/docs/architecture/">
       <img alt="API Documentation" src="https://img.shields.io/badge/API_Docs-green?labelColor=404040&color=353535&style=for-the-badge&logo=fastapi&logoColor=white" href="#">
   </a>
-  <a href="./docs">
+  <a href="/docs/">
       <img alt="Project Documentation" src="https://img.shields.io/badge/documentation-green?labelColor=404040&color=353535&style=for-the-badge&logo=readthedocs&logoColor=white" href="/docs/">
   </a>
 <br>
@@ -61,9 +61,9 @@ O FiveLib foi desenhado com o princípio de "Documentation First". Todas as espe
 
 Para uma compreensão detalhada, acesse os domínios específicos abaixo:
 
-* [Requirements](https://www.google.com/search?q=./docs/requirements): Definição de escopo, regras de negócio (RN), requisitos (RF/RNF) e casos de uso.
-* [Architecture](https://www.google.com/search?q=./docs/architecture): Modelagem de dados (ERD), Dicionário de Dados e contratos de API (Swagger/OpenAPI).
-* [Infrastructure](https://www.google.com/search?q=./docs/infrastructure): Configurações de containers Docker, redes e estratégias de implantação.
+* [Requirements](/docs/requirements/): Definição de escopo, regras de negócio (RN), requisitos (RF/RNF) e casos de uso.
+* [Architecture](/docs/architecture/): Modelagem de dados (ERD), Dicionário de Dados e contratos de API (Swagger/OpenAPI).
+* [Infrastructure](/docs/infrastructure/): Configurações de containers Docker, redes e estratégias de implantação.
 * **Dossier Final:** Compilado absoluto do projeto para auditoria acadêmica (`dossier-final.pdf`).
 
 ## Diretrizes de Desenvolvimento
@@ -78,4 +78,4 @@ Para contribuir ou manter o código, as seguintes diretrizes arquiteturais e de 
 
 O FiveLib é um projeto aberto a melhorias. Valorizamos contribuições que respeitem a arquitetura e os padrões estabelecidos.
 
-Para entender as regras de desenvolvimento, fluxo de trabalho e como enviar suas alterações, leia nosso [Guia de Contribuição](https://www.google.com/search?q=./CONTRIBUTING.md).
+Para entender as regras de desenvolvimento, fluxo de trabalho e como enviar suas alterações, leia nosso [Guia de Contribuição](/.github/CONTRIBUTING.md).
