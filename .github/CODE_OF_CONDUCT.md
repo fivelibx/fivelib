@@ -1,6 +1,6 @@
-# Código de Conduta do DevAcademicX
+# Código de Conduta do Fivelib
 
-O DevAcademicX preza por um ambiente de desenvolvimento pautado pela **objetividade técnica** e pelo **profissionalismo**. Nosso objetivo é a construção de software estável, manutenível e bem documentado.
+O Fivelib preza por um ambiente de desenvolvimento pautado pela **objetividade técnica** e pelo **profissionalismo**. Nosso objetivo é a construção de software estável, manutenível e bem documentado.
 
 ### 1. Padrão de Comportamento
 Esperamos que todos os colaboradores e envolvidos no projeto mantenham um comportamento profissional. Isso inclui:
