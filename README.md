@@ -11,6 +11,9 @@
   <a href="/docs/">
       <img alt="Project Documentation" src="https://img.shields.io/badge/documentation-green?labelColor=404040&color=353535&style=for-the-badge&logo=readthedocs&logoColor=white" href="/docs/">
   </a>
+  <a href="https://github.com/orgs/devacademicx/projects/1">
+  <img alt="Project Management" src="https://img.shields.io/badge/management-GitHub_Projects-blue?labelColor=404040&color=353535&style=for-the-badge&logo=github&logoColor=white">
+    </a>
 <br>
 <br>
 </div>
@@ -47,6 +50,17 @@ docker-compose up --build
 * Sistema de biblioteca pessoal para salvar e organizar referências.
 * Interface totalmente assíncrona garantindo fluidez no consumo de dados.
 
+## Roadmap & Progresso
+
+O desenvolvimento do FiveLib é gerenciado de forma transparente através do **GitHub Projects**. Você pode acompanhar o status das funcionalidades, correções de bugs e o planejamento das próximas Milestones em tempo real.
+
+* [**Acessar Quadro de Gestão ↗**](https://github.com/orgs/devacademicx/projects/1)
+
+### Status das Camadas:
+
+* **Frontend:** **Estável.** A migração completa da arquitetura para Next.js foi concluída, estabelecendo uma base sólida e performática para a interface.
+* **Backend:** **Em Desenvolvimento.** Atualmente, estamos focados no **Milestone 02/03**, que compreende a estruturação das rotas de API (Issue #09) e a integração inicial com a persistência de dados via SQLAlchemy (Issue #08).
+
 ## Arquitetura do Sistema
 
 O projeto adota uma abordagem rigorosa de **API-first** com desacoplamento total entre as camadas do software:
@@ -64,7 +78,7 @@ Para uma compreensão detalhada, acesse os domínios específicos abaixo:
 * [Requirements](/docs/requirements/): Definição de escopo, regras de negócio (RN), requisitos (RF/RNF) e casos de uso.
 * [Architecture](/docs/architecture/): Modelagem de dados (ERD), Dicionário de Dados e contratos de API (Swagger/OpenAPI).
 * [Infrastructure](/docs/infrastructure/): Configurações de containers Docker, redes e estratégias de implantação.
-* **Dossier Final:** Compilado absoluto do projeto para auditoria acadêmica (`dossier-final.pdf`).
+* [**Dossier Final:**]() Compilado absoluto do projeto para auditoria acadêmica (`dossier-final.pdf`).
 
 ## Diretrizes de Desenvolvimento
 
