@@ -19,7 +19,7 @@ graph TD
     %% Vercel
     subgraph Vercel_Cloud ["Vercel — Frontend"]
         direction TB
-        F_Static["📦 Arquivos Estáticos<br/>(React / Vite)"]
+        F_Static["📦 Next.js (App Router)"]
         F_Edge["⚡ Edge Network<br/>(CDN)"]
         F_Static --> F_Edge
     end
@@ -45,7 +45,7 @@ graph TD
     end
 
     %% Fluxo
-    User -->|"HTTPS / VITE_API_URL"| F_Edge
+    User -->|"HTTPS / NEXT_PUBLIC_API_URL"| F_Edge
     F_Edge -->|"HTTP Requests"| B_API
     B_API -->|"SQL / DATABASE_URL"| S_Postgres
 

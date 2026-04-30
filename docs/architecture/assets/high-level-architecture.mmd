@@ -2,41 +2,31 @@
 config:
   layout: elk
 ---
-graph TB
-    subgraph Client ["Frontend - Vite/React"]
+flowchart TB
+ subgraph Client["Frontend - Next.js"]
         UI["Interface de Usuário"]
         State["Gerenciamento de Estado"]
-    end
-
-    subgraph APILayer ["Backend - FastAPI"]
+  end
+ subgraph APILayer["Backend - FastAPI"]
         Routes["Rotas / Endpoints"]
         Schema["Pydantic Models/Schemas"]
         Service["Service Layer/Business Logic"]
         Repo["Repository Layer/ORM"]
-    end
-
-    subgraph DataLayer ["PostgreSQL"]
-        DB[("DevAcademicX DB")]
-    end
-
-    subgraph Docker ["Docker Environment"]
+  end
+ subgraph DataLayer["PostgreSQL"]
+        DB[("Fivelib DB")]
+  end
+ subgraph Docker["Docker Environment"]
         APILayer
-    end
-
-    %% Fluxo de Comunicação
-    UI -->|"JSON/REST"| Routes
+  end
+    UI -- JSON/REST --> Routes
     Routes --> Schema
     Schema --> Service
     Service --> Repo
-    Repo -->|"SQL/Query"| DB
+    Repo -- SQL/Query --> DB
 
-    %% Styling
+     APILayer:::apiStyle
     classDef clientStyle stroke:#38bdf8,fill:#f0f9ff,color:#1e1b4b
     classDef apiStyle stroke:#a78bfa,fill:#f5f3ff,color:#1e1b4b
     classDef dataStyle stroke:#4ade80,fill:#f0fdf4,color:#1e1b4b
     classDef containerStyle stroke:#fb923c,fill:#fff7ed,color:#1e1b4b
-
-    class Client clientStyle
-    class APILayer apiStyle
-    class DataLayer dataStyle
-    class Docker containerStyle
