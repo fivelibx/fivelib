@@ -33,7 +33,7 @@ graph LR
         %% Job: Frontend
         subgraph Job_Frontend ["Job — Deploy Frontend"]
             direction TB
-            JF_Build["Node Build (Vite)"]
+            JF_Build["Next.js Build"]
             JF_Deploy["Deploy to Vercel"]
             JF_Build --> JF_Deploy
         end

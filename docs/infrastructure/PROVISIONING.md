@@ -1,61 +1,72 @@
-# Arquitetura de Infraestrutura e Segurança: FiveLib
+
+# 🏗️ Arquitetura de Infraestrutura e Segurança: FiveLib
 
 ## 1. Visão Geral
-Este documento detalha a arquitetura de infraestrutura e as estratégias de segurança implementadas no projeto **FiveLib**. O sistema utiliza uma arquitetura distribuída, separando claramente as camadas de apresentação, processamento e persistência de dados.
+
+Este documento detalha a arquitetura de infraestrutura e as estratégias de segurança implementadas no projeto  **FiveLibX** . O sistema utiliza uma arquitetura distribuída, separando claramente as camadas de apresentação (Frontend), processamento (Backend) e persistência de dados (Database).
 
 ## 2. Componentes da Infraestrutura
 
 ### A. Persistência de Dados: Supabase (PostgreSQL)
+
 * **Função:** Camada de banco de dados relacional.
-* **Segurança:** Utiliza autenticação baseada em credenciais (Connection String) gerenciada por variáveis de ambiente no Backend. O acesso externo é restrito e monitorado.
+* **Segurança:** Utiliza autenticação baseada em credenciais (Connection String) gerenciada por variáveis de ambiente no Backend. O acesso externo é restrito e monitorado via políticas do provedor.
 
 ### B. Backend: Render (FastAPI + Docker)
-* **Função:** Camada de processamento de regras de negócio, API e migrações de banco de dados (Alembic).
-* **Infraestrutura:** Utiliza containers Docker. A configuração é garantida via variáveis de ambiente injetadas diretamente no painel do Render, evitando o armazenamento de segredos (`.env`) no repositório.
-* **Deploy:** Automatizado via GitHub, garantindo que o ambiente de produção espelhe a arquitetura testada localmente.
 
-### C. Frontend: Vercel (Vite + React)
-* **Função:** Camada de interface de usuário (UI).
-* **Distribuição:** Deploy em rede de borda (Edge Network) para alta performance.
-* **Integração:** Comunica-se com o Backend via requisições HTTP, utilizando a variável `VITE_API_URL` para identificar o ponto de extremidade da API.
+* **Função:** Camada de processamento de regras de negócio, API e migrações de banco de dados via **SQLAlchemy** e  **Alembic** .
+* **Infraestrutura:** Utiliza containers Docker para garantir paridade entre os ambientes de desenvolvimento (homelab) e produção.
+* **Deploy:** Automatizado via GitHub Actions, garantindo que cada push na branch `main` dispare o build da imagem Docker no Render.
+
+### C. Frontend: Vercel (Next.js)
+
+* **Função:** Camada de interface de usuário (UI) utilizando o  **Next.js App Router** .
+* **Distribuição:** Deploy em rede de borda (Edge Network) da Vercel.
+* **Integração:** Utiliza a variável `NEXT_PUBLIC_API_URL` para comunicação com o Backend, aproveitando as funcionalidades de Server Components para chamadas seguras no lado do servidor.
 
 ---
 
 ## 3. Estratégias de Segurança
 
 ### Gerenciamento de Segredos (Secrets Management)
-* **Injeção de Variáveis:** Todos os dados sensíveis (`DATABASE_URL`, chaves de acesso) são configurados nos painéis de controle dos provedores e nunca são expostos no código-fonte ou no GitHub.
-* **Exclusão de Arquivos:** O arquivo `.gitignore` está configurado para impedir o envio acidental de arquivos `.env` locais.
+
+* **Injeção de Variáveis:** Dados sensíveis (`DATABASE_URL`, chaves de API) são configurados exclusivamente nos painéis de controle (Render/Vercel) e nunca expostos no GitHub.
+* **Prevenção de Vazamento:** O arquivo `.gitignore` bloqueia arquivos `.env` locais, e o uso de tipos de variáveis no Next.js (com e sem o prefixo `NEXT_PUBLIC_`) garante que segredos de backend não vazem para o navegador.
 
 ### Segurança de Comunicação (CORS)
-* **Restrição de Origem:** O Backend (FastAPI) utiliza o middleware de CORS para aceitar requisições apenas da URL oficial do Frontend hospedado na Vercel. 
-* Isso impede que sites terceiros ou scripts maliciosos consigam consumir a API sem autorização, mesmo que conheçam o endpoint.
 
-### Segregação de Responsabilidades
-* O **Frontend** atua apenas como consumidor. Ele não possui permissão de acesso direto ao banco de dados, protegendo a integridade das tabelas contra manipulações diretas no navegador.
-* O **Backend** centraliza a validação de dados e regras de acesso antes de qualquer operação de leitura ou escrita.
+* **Restrição de Origem:** O Backend (FastAPI) utiliza o middleware de CORS para aceitar requisições apenas da URL oficial do Frontend. Isso impede que scripts maliciosos consumam a API de domínios não autorizados.
+
+### Camadas de Proteção
+
+* **Server-Side Rendering (SSR):** O uso de Next.js permite que certas validações e buscas de dados ocorram no servidor, ocultando a lógica de negócio e os endpoints internos do cliente final.
+* **Validação de Esquemas:** Uso extensivo de **Pydantic** no Backend e **Zod** no Frontend para garantir a integridade dos dados trafegados via JSON.
 
 ---
 
 ## 4. Fluxo de Execução
-1. O usuário interage com o **Frontend (Vercel)**.
-2. O navegador realiza chamadas para o endereço definido em `VITE_API_URL`.
-3. O **Backend (Render)** valida a origem (CORS).
-4. O Backend processa a lógica e consulta o **Supabase** via `DATABASE_URL`.
-5. Os dados retornam para o usuário de forma segura e tratada.
+
+1. O usuário acessa o  **Frontend (Vercel)** .
+2. O **Next.js** renderiza a página (via Server ou Client Components).
+3. Chamadas de API são feitas para o **Backend (Render)** usando `NEXT_PUBLIC_API_URL`.
+4. O Backend valida a requisição, processa a lógica com **SQLAlchemy** e consulta o  **Supabase** .
+5. A resposta retorna tratada para a interface do usuário.
 
 ---
 
 ## 5. Requisitos de Ambiente (Prerequisites)
-Para desenvolver ou operar este sistema, certifique-se de ter:
-* Docker Engine (v24+)
-* Python 3.12+
-* Node.js 20+
+
+Para operar ou contribuir com o projeto localmente:
+
+* **Docker Engine** (v24+)
+* **Python** 3.12+ (gerenciado via `pyenv`)
+* **Node.js** 20+ com **pnpm**
+* **PostgreSQL** (ou container Docker local para testes)
 
 ## 6. Variáveis de Ambiente
-O projeto depende das seguintes variáveis (configure-as no painel de controle do seu provedor):
 
-| Variável | Descrição | Obrigatório |
-| :--- | :--- | :--- |
-| `DATABASE_URL` | Conexão com Supabase (PostgreSQL) | Sim |
-| `VITE_API_URL` | Endpoint da API do Backend | Sim |
+| Variável               | Descrição                                    | Escopo   |
+| ----------------------- | ---------------------------------------------- | -------- |
+| `DATABASE_URL`        | String de conexão com o PostgreSQL (Supabase) | Backend  |
+| `NEXT_PUBLIC_API_URL` | Endpoint público da API para o Frontend       | Frontend |
+| `NODE_ENV`            | Define o ambiente (development/production)     |          |
