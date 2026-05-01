@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from database.config import supabase
 
-router = APIRouter(prefix="/health", tags=["health"])
+router = APIRouter(tags=["health"])
 
 @router.get("/")
 def health_check():
