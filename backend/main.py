@@ -2,10 +2,10 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-
 # Rotas da API
 from api.routes.health import router as health_router
 from api.routes.users import router as users_router
+from api.routes.tools import router as tools_router
 
 app = FastAPI(
     title="FiveLib API",
@@ -27,6 +27,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+async def root():
+    return {"message": "FiveLib API is running"}
+
 # NOTE: Registro dos roteadores.
 app.include_router(health_router, prefix="/health")
 app.include_router(users_router, prefix="/users")
+app.include_router(tools_router, prefix="/resources", tags=["Tools"])
