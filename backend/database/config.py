@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from supabase import create_client, Client
 
 class Settings(BaseSettings):
     SUPABASE_URL: str = ""
@@ -11,3 +12,5 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)

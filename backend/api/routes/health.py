@@ -1,18 +1,14 @@
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from sqlalchemy import text
-from backend.database.config import get_db
+from fastapi import APIRouter
+from database.config import supabase
 
 router = APIRouter(prefix="/health", tags=["health"])
 
 @router.get("/")
-def health_check(db: Session = Depends(get_db)):
+def health_check():
     try:
-        #NOTE: Executa uma consulta simples para validar a conectividade com o banco
-        db.execute(text("SELECT 1"))
-        db_status = "ok"
+        supabase.table("tool").select("count", count="exact").limit(1).execute()
+        db_status = "running"
     except Exception as e:
-        #NOTE: Em caso de falha na conexão ou timeout
         db_status = f"unreachable: {str(e)}"
     
     return {
