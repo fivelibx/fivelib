@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class ToolSchema(BaseModel):
-    id: id
+    id: int
     nome: str
     descricao: str
     url_oficial: str
