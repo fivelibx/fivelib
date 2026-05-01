@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { getResources, Tool } from "../../services/api"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, ToolCard } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Header } from "@/components/header"
@@ -151,34 +151,7 @@ export default function BuscaPage() {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredLibraries.map((lib) => (
-                <Card key={lib.id} className="group border-border bg-card transition-all hover:border-primary/50">
-                  <CardContent className="p-6">
-                    <div className="mb-4 flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-foreground group-hover:text-primary">
-                            {lib.nome}
-                          </h3>
-                          <p className="text-xs text-muted-foreground">{lib.linguagem}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-                      {lib.descricao}
-                    </p>
-                    <div className="flex items-center justify-end">
-                      <Link href={lib.url_oficial} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="sm" className="gap-1 text-primary hover:bg-primary/10">
-                          Docs
-                          <ExternalLink className="h-3 w-3" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ToolCard key={lib.id} tool={lib} />
               ))}
             </div>
           </div>
