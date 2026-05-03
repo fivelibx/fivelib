@@ -1,17 +1,35 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Search, Menu, X, BookOpen, User, LogOut } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import Cookies from "js-cookie"
 
-interface HeaderProps {
-  isLoggedIn?: boolean
-  userName?: string
-}
 
-export function Header({ isLoggedIn = false, userName = "Usuário" }: HeaderProps) {
+// interface HeaderProps {
+//   isLoggedIn?: boolean
+//   userName?: string
+// }
+
+export function Header() {
+  const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn]=useState(false)
+
+  //verificando se o cookie existe ao carregar
+  useEffect(()=>{
+    const token = Cookies.get("fivelib_token")
+    setIsLoggedIn(!!token)
+  }, [])
+
+  const handleLogout = ()=>{
+    Cookies.remove("fivelib_token")
+    setIsLoggedIn(false)
+    router.push("/")
+    router.refresh()
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -57,7 +75,7 @@ export function Header({ isLoggedIn = false, userName = "Usuário" }: HeaderProp
               <Link href="/dashboard">
                 <Button variant="ghost" className="gap-2 text-muted-foreground hover:text-primary">
                   <User className="h-4 w-4" />
-                  {userName}
+                  {/* {userName} */}Meu Perfil
                 </Button>
               </Link>
               <Link href="/">
@@ -135,7 +153,7 @@ export function Header({ isLoggedIn = false, userName = "Usuário" }: HeaderProp
                   <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full justify-start gap-2">
                       <User className="h-4 w-4" />
-                      {userName}
+                      {/* {userName} */}Meu perfil
                     </Button>
                   </Link>
                   <Link href="/" onClick={() => setMobileMenuOpen(false)}>

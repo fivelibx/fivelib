@@ -1,6 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { API_URL } from "@/services/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,13 +11,46 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { BookOpen, Mail, Lock, ArrowRight, Github } from "lucide-react"
 import { useState } from "react"
+import Cookies from "js-cookie"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setIsLoading(true)
+    setError("")
+
+    try{
+      const response = await fetch(`${API_URL}`, {
+        method: "POST",
+        headers: {
+          "Content-Type":"application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok){
+        throw new Error(data.detail || "Falha ao reaiizar o Login")
+      }
+      //armazenando token nos cookies para 1 dia
+      Cookies.set("fivelib_token", data.access_token, {expires: 1})
+
+      router.push("/dashboard")
+      router.refresh()
+    } catch(err:any){
+      setError(err.message)
+    } finally{
+      setIsLoading(false)
+    }
     // Mock login - redirect to dashboard
     window.location.href = "/dashboard"
   }
