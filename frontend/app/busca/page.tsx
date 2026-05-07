@@ -25,8 +25,10 @@ export default function BuscaPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
     async function loadData() {
       try {
         const data = await getResources()
@@ -65,8 +67,8 @@ export default function BuscaPage() {
 
   const hasActiveFilters = selectedLanguages.length > 0 || searchQuery !== ""
 
-  if (loading) {
-    return <div className="flex min-h-screen items-center justify-center">Carregando recursos...</div>
+  if (!mounted || loading) {
+    return <div className="flex min-h-screen items-center justify-center">Aguarde 10 segundos para ser redirecionado...</div>
   }
 
   return (

@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -151,11 +152,25 @@ type TicketStatus = "Pendente" | "Analisando" | "Resolvido" | "Rejeitado"
 type UserStatus = "Ativo" | "Restrito" | "Banido"
 
 export default function AdminPage() {
+  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
   const [tickets, setTickets] = useState(mockTickets)
   const [users, setUsers] = useState(mockUsers)
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTicket, setSelectedTicket] = useState<typeof mockTickets[0] | null>(null)
   const [isTicketDialogOpen, setIsTicketDialogOpen] = useState(false)
+
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    const userRole = localStorage.getItem("user_role")
+
+    if (!token || userRole !== "admin") {
+      router.push("/")
+      return
+    }
+
+    setMounted(true)
+  }, [router])
 
   const getStatusBadge = (status: TicketStatus) => {
     const styles = {
@@ -217,13 +232,16 @@ export default function AdminPage() {
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  if (!mounted) {
+    return null
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header isLoggedIn userName="Admin" />
 
       <main className="flex-1 py-8">
         <div className="container mx-auto px-4">
-          {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
               <Shield className="h-4 w-4" />
@@ -237,7 +255,6 @@ export default function AdminPage() {
             </p>
           </div>
 
-          {/* Stats Cards */}
           <div className="mb-8 grid gap-4 sm:grid-cols-4">
             <Card className="border-border bg-card">
               <CardContent className="flex items-center gap-4 p-6">
@@ -285,7 +302,6 @@ export default function AdminPage() {
             </Card>
           </div>
 
-          {/* Search */}
           <div className="mb-6">
             <div className="relative max-w-md">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -299,7 +315,6 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Tabs */}
           <Tabs defaultValue="tickets" className="space-y-6">
             <TabsList className="border border-border bg-secondary">
               <TabsTrigger
@@ -318,7 +333,6 @@ export default function AdminPage() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Tickets Tab */}
             <TabsContent value="tickets">
               <Card className="border-border bg-card">
                 <CardHeader>
@@ -409,7 +423,6 @@ export default function AdminPage() {
               </Card>
             </TabsContent>
 
-            {/* Users Tab */}
             <TabsContent value="users">
               <Card className="border-border bg-card">
                 <CardHeader>
@@ -493,7 +506,6 @@ export default function AdminPage() {
         </div>
       </main>
 
-      {/* Ticket Detail Dialog */}
       <Dialog open={isTicketDialogOpen} onOpenChange={setIsTicketDialogOpen}>
         <DialogContent className="border-border bg-card">
           <DialogHeader>
