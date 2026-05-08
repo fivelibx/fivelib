@@ -3,15 +3,35 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Search, Menu, X, BookOpen, User, LogOut } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface HeaderProps {
   isLoggedIn?: boolean
   userName?: string
 }
 
-export function Header({ isLoggedIn = false, userName = "Usuário" }: HeaderProps) {
+export function Header({ isLoggedIn: initialIsLoggedIn = false, userName: initialUserName = "Usuário" }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  
+  const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn)
+  const [userName, setUserName] = useState(initialUserName)
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token")
+    const savedName = localStorage.getItem("user_name")
+
+    if (token) {
+      setIsLoggedIn(true)
+      if (savedName) setUserName(savedName)
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token")
+    localStorage.removeItem("user_name")
+    localStorage.removeItem("user_role")
+    window.location.href = "/"
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
@@ -60,12 +80,15 @@ export function Header({ isLoggedIn = false, userName = "Usuário" }: HeaderProp
                   {userName}
                 </Button>
               </Link>
-              <Link href="/">
-                <Button variant="outline" size="icon" className="border-border hover:border-primary hover:text-primary">
-                  <LogOut className="h-4 w-4" />
-                  <span className="sr-only">Sair</span>
-                </Button>
-              </Link>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={handleLogout}
+                className="border-border hover:border-primary hover:text-primary"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="sr-only">Sair</span>
+              </Button>
             </div>
           ) : (
             <>
@@ -138,12 +161,14 @@ export function Header({ isLoggedIn = false, userName = "Usuário" }: HeaderProp
                       {userName}
                     </Button>
                   </Link>
-                  <Link href="/" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start gap-2 text-destructive">
-                      <LogOut className="h-4 w-4" />
-                      Sair
-                    </Button>
-                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    onClick={handleLogout}
+                    className="w-full justify-start gap-2 text-destructive"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sair
+                  </Button>
                 </>
               ) : (
                 <>
