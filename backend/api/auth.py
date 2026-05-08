@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from schemas.auth import LoginRequest, LoginResponse
+from schemas.auth import LoginRequest, LoginResponse, RegisterRequest
 from database.config import supabase
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
@@ -33,3 +33,31 @@ async def login(data: LoginRequest):
         "role": user["perfil"], 
         "name": user["nome"]
     }
+
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+async def register(data: RegisterRequest):
+    user_exists = supabase.table("user").select("id").eq("email", data.email).execute()
+    
+    if user_exists.data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Este e-mail já está cadastrado."
+        )
+    
+    novo_usuario = {
+        "nome": data.nome,
+        "email": data.email,
+        "senha": data.senha,
+        "data_nascimento": data.data_nascimento.isoformat(),
+        "perfil": "user"
+    }
+    
+    insert_response = supabase.table("user").insert(novo_usuario).execute()
+    
+    if not insert_response.data:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Erro ao criar conta. Tente novamente mais tarde."
+        )
+    
+    return {"message": "Cadastro realizado com sucesso!"}
