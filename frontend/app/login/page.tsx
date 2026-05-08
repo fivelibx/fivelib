@@ -7,17 +7,58 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { BookOpen, Mail, Lock, ArrowRight, Github } from "lucide-react"
+import { BookOpen, Mail, Lock, ArrowRight, Github, Loader2 } from "lucide-react"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { login } from "../../services/api"
 
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({})
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validate = () => {
+    const errors: { email?: string; password?: string } = {}
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    
+    if (!email) {
+      errors.email = "O e-mail é obrigatório."
+    } else if (!emailRegex.test(email)) {
+      errors.email = "Por favor, insira um e-mail válido."
+    }
+
+    if (!password) {
+      errors.password = "A senha é obrigatória."
+    }
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock login - redirect to dashboard
-    window.location.href = "/dashboard"
+    
+    if (!validate()) return
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const data = await login({ email, password })
+
+      if (data.role === "admin") {
+        router.push("/admin")
+      } else {
+        router.push("/dashboard")
+      }
+    } catch (err: any) {
+      setError(err.message || "Credenciais inválidas")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -26,7 +67,6 @@ export default function LoginPage() {
 
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
-          {/* Logo */}
           <div className="mb-8 text-center">
             <Link href="/" className="inline-flex items-center gap-2">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary">
@@ -49,7 +89,12 @@ export default function LoginPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} noValidate className="space-y-4">
+                {error && (
+                  <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                    {error}
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-foreground">
                     E-mail
@@ -61,11 +106,17 @@ export default function LoginPage() {
                       type="email"
                       placeholder="seu@email.com"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
-                      required
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                        if (fieldErrors.email) setFieldErrors({ ...fieldErrors, email: undefined })
+                      }}
+                      className={`border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary ${fieldErrors.email ? 'border-destructive' : ''}`}
+                      disabled={isLoading}
                     />
                   </div>
+                  {fieldErrors.email && (
+                    <p className="text-xs text-destructive">{fieldErrors.email}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -87,19 +138,35 @@ export default function LoginPage() {
                       type="password"
                       placeholder="••••••••"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
-                      required
+                      onChange={(e) => {
+                        setPassword(e.target.value)
+                        if (fieldErrors.password) setFieldErrors({ ...fieldErrors, password: undefined })
+                      }}
+                      className={`border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary ${fieldErrors.password ? 'border-destructive' : ''}`}
+                      disabled={isLoading}
                     />
                   </div>
+                  {fieldErrors.password && (
+                    <p className="text-xs text-destructive">{fieldErrors.password}</p>
+                  )}
                 </div>
 
                 <Button
                   type="submit"
                   className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
+                  disabled={isLoading}
                 >
-                  Entrar
-                  <ArrowRight className="h-4 w-4" />
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Autenticando...
+                    </>
+                  ) : (
+                    <>
+                      Entrar
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               </form>
 
@@ -117,6 +184,7 @@ export default function LoginPage() {
               <Button
                 variant="outline"
                 className="w-full gap-2 border-border text-foreground hover:border-primary hover:text-primary"
+                disabled={isLoading}
               >
                 <Github className="h-4 w-4" />
                 GitHub

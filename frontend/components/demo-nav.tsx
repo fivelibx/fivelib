@@ -3,14 +3,26 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Home, LogIn, UserPlus, Search, LayoutDashboard, HelpCircle } from "lucide-react"
+import { Home, LogIn, UserPlus, Search, LayoutDashboard, HelpCircle, ShieldCheck } from "lucide-react"
+import { useState, useEffect } from "react"
 
 interface DemoNavProps {
   isLoggedIn?: boolean
 }
 
-export function DemoNav({ isLoggedIn = false }: DemoNavProps) {
+export function DemoNav({ isLoggedIn: initialIsLoggedIn = false }: DemoNavProps) {
   const pathname = usePathname()
+  
+  const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn)
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token")
+    const role = localStorage.getItem("user_role")
+    
+    setIsLoggedIn(!!token)
+    setUserRole(role)
+  }, [pathname]) 
 
   const navItems = [
     { href: "/", label: "Home", icon: Home },
@@ -18,6 +30,7 @@ export function DemoNav({ isLoggedIn = false }: DemoNavProps) {
     { href: "/cadastro", label: "Cadastro", icon: UserPlus, hideIfLogged: true },
     { href: "/busca", label: "Busca", icon: Search },
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, protected: true },
+    { href: "/admin", label: "Admin", icon: ShieldCheck, adminOnly: true },
     { href: "/suporte", label: "Suporte", icon: HelpCircle },
   ]
 
@@ -26,6 +39,7 @@ export function DemoNav({ isLoggedIn = false }: DemoNavProps) {
       <div className="flex items-center gap-1 rounded-full border border-border bg-card/95 px-2 py-2 shadow-lg backdrop-blur supports-backdrop-filter:bg-card/80">
         {navItems
           .filter(item => {
+            if (item.adminOnly && userRole !== 'admin') return false
             if (item.protected && !isLoggedIn) return false
             if (item.hideIfLogged && isLoggedIn) return false
             return true
