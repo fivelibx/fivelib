@@ -21,6 +21,13 @@ export interface AuthResponse {
   name: string;
 }
 
+export interface RegisterData {
+  nome: string;
+  email: string;
+  senha: string;
+  data_nascimento: string;
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -66,3 +73,23 @@ export const api = {
     return response.json();
   }
 };
+
+export async function register(userData: RegisterData): Promise<{ message: string }> {
+  const url = `${API_URL}/auth/register`.replace(/([^:]\/)\/+/g, "$1");
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.detail || 'Falha ao realizar cadastro');
+  }
+
+  return data;
+}

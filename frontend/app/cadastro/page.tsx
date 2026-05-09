@@ -8,21 +8,50 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { BookOpen, Mail, Lock, User, ArrowRight, Github, Calendar } from "lucide-react"
+import { BookOpen, Mail, Lock, User, ArrowRight, Github, Calendar, Loader2 } from "lucide-react"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { register } from "../../services/api"
 
 export default function CadastroPage() {
+  const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [birthDate, setBirthDate] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [acceptTerms, setAcceptTerms] = useState(false)
+  
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock registration - redirect to login
-    window.location.href = "/login"
+    setError(null)
+
+    // Validação de senhas coincidentes no frontend
+    if (password !== confirmPassword) {
+      setError("As senhas não coincidem.")
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      await register({
+        nome: name,
+        email: email,
+        senha: password, // Envia como 'senha' para mapear com o backend
+        data_nascimento: birthDate, // Envia como 'data_nascimento'
+      })
+
+      // Redireciona para o login informando sucesso via query param
+      router.push("/login?registered=true")
+    } catch (err: any) {
+      setError(err.message || "Erro ao conectar com o servidor.")
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -55,6 +84,12 @@ export default function CadastroPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive font-medium">
+                    {error}
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label htmlFor="name" className="text-foreground">
                     Nome completo
@@ -69,6 +104,7 @@ export default function CadastroPage() {
                       onChange={(e) => setName(e.target.value)}
                       className="border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -87,6 +123,7 @@ export default function CadastroPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       className="border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -104,10 +141,11 @@ export default function CadastroPage() {
                       onChange={(e) => setBirthDate(e.target.value)}
                       className="border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Você deve ter 18 anos ou mais para se cadastrar (RN01)
+                    Menores de 18 anos possuem restrições na abertura de chamados.
                   </p>
                 </div>
 
@@ -125,6 +163,7 @@ export default function CadastroPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       className="border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -143,6 +182,7 @@ export default function CadastroPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       className="border-border bg-secondary pl-10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary"
                       required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
@@ -153,6 +193,7 @@ export default function CadastroPage() {
                     checked={acceptTerms}
                     onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
                     className="mt-1 border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                    disabled={isLoading}
                   />
                   <Label
                     htmlFor="terms"
@@ -172,10 +213,19 @@ export default function CadastroPage() {
                 <Button
                   type="submit"
                   className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-                  disabled={!acceptTerms}
+                  disabled={!acceptTerms || isLoading}
                 >
-                  Criar Conta
-                  <ArrowRight className="h-4 w-4" />
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Processando...
+                    </>
+                  ) : (
+                    <>
+                      Criar Conta
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               </form>
 
@@ -193,6 +243,7 @@ export default function CadastroPage() {
               <Button
                 variant="outline"
                 className="w-full gap-2 border-border text-foreground hover:border-primary hover:text-primary"
+                disabled={isLoading}
               >
                 <Github className="h-4 w-4" />
                 GitHub
