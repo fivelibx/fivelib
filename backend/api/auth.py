@@ -3,6 +3,9 @@ from fastapi.security import OAuth2PasswordBearer
 from schemas.auth import LoginRequest, LoginResponse, RegisterRequest
 from database.config import supabase
 
+
+from api.security import obter_hash_senha, verificar_senha, criar_token_acesso
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
 router = APIRouter(tags=["auth"])
@@ -21,16 +24,24 @@ async def login(data: LoginRequest):
     
     user = user_data[0]
     
-    if user["senha"] != data.password:
+    if not verificar_senha(data.password, user["senha"]):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="E-mail ou senha incorretos"
         )
     
+    payload_usuario = {
+        "sub": str(user["id"]),
+        "email": user["email"],
+        "role": user["perfil"]
+    }
+    
+    token_real = criar_token_acesso(data=payload_usuario)
+    
     return {
-        "access_token": "token-real-provisorio-supabase",
+        "access_token": token_real,
         "token_type": "bearer",
-        "role": user["perfil"], 
+        "role": user["perfil"],  
         "name": user["nome"]
     }
 
@@ -44,10 +55,12 @@ async def register(data: RegisterRequest):
             detail="Este e-mail já está cadastrado."
         )
     
+    senha_criptografada = obter_hash_senha(data.senha)
+    
     novo_usuario = {
         "nome": data.nome,
         "email": data.email,
-        "senha": data.senha,
+        "senha": senha_criptografada,
         "data_nascimento": data.data_nascimento.isoformat(),
         "perfil": "user"
     }
