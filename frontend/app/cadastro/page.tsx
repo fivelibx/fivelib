@@ -29,7 +29,6 @@ export default function CadastroPage() {
     e.preventDefault()
     setError(null)
 
-    // Validação de senhas coincidentes no frontend
     if (password !== confirmPassword) {
       setError("As senhas não coincidem.")
       return
@@ -41,12 +40,11 @@ export default function CadastroPage() {
       await register({
         nome: name,
         email: email,
-        senha: password, // Envia como 'senha' para mapear com o backend
-        data_nascimento: birthDate, // Envia como 'data_nascimento'
+        senha: password,
+        data_nascimento: birthDate,
       })
 
-      // Redireciona para o login informando sucesso via query param
-      router.push("/login?registered=true")
+      router.push(`/verificar-conta?email=${encodeURIComponent(email)}`)
     } catch (err: any) {
       setError(err.message || "Erro ao conectar com o servidor.")
     } finally {

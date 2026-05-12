@@ -93,3 +93,21 @@ export async function register(userData: RegisterData): Promise<{ message: strin
 
   return data;
 }
+
+export async function verifyCode(data: { email: string; code: string }) {
+  const response = await fetch(`${API_URL}/auth/verify-code`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.detail || "Erro ao verificar código.");
+  }
+
+  return result;
+}

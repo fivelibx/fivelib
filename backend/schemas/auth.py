@@ -16,3 +16,7 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     senha: str
     data_nascimento: date
+
+class VerifyCodeRequest(BaseModel):
+    email: EmailStr
+    code: str
