@@ -28,6 +28,18 @@ export interface RegisterData {
   data_nascimento: string;
 }
 
+export class ApiError extends Error {
+  status: number;
+  data: any;
+
+  constructor(message: string, status: number, data: any) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
+  }
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -51,7 +63,12 @@ export async function login(credentials: any): Promise<AuthResponse> {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.detail || 'Falha ao realizar login');
+    
+    const errorMessage = typeof errorData.detail === 'string' 
+      ? errorData.detail 
+      : (errorData.detail?.message || 'Falha ao realizar login');
+      
+    throw new ApiError(errorMessage, response.status, errorData);
   }
 
   const data: AuthResponse = await response.json();

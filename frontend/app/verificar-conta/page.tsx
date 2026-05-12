@@ -44,7 +44,6 @@ function VerificarContaContent() {
         code: code,
       })
 
-      // Conta ativada! Agora sim vai para o login com flag de sucesso
       router.push("/login?registered=true")
     } catch (err: any) {
       setError(err.message || "Código inválido ou expirado.")
@@ -146,7 +145,6 @@ function VerificarContaContent() {
   )
 }
 
-// O Next.js exige Suspense em torno de useSearchParams se usado em client-side rendering estático
 export default function VerificarContaPage() {
   return (
     <Suspense fallback={

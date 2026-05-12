@@ -4,7 +4,6 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from schemas.auth import LoginRequest, LoginResponse, RegisterRequest, VerifyCodeRequest
 from database.config import supabase
-
 from api.security import obter_hash_senha, verificar_senha, criar_token_acesso
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
@@ -31,12 +30,32 @@ async def login(data: LoginRequest):
             detail="E-mail ou senha incorretos"
         )
     
+    # 🔥 AQUI ESTÁ A MUDANÇA: Se a senha bateu, mas a conta está inativa
     if not user.get("is_active", False):
+        # 1. Gera e atualiza o novo código no banco antes de barrar
+        novo_codigo = f"{random.randint(100000, 999999)}"
+        novo_tempo_expiracao = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
+        
+        print("\n" + "="*50)
+        print(f"🔑 [LOGIN - CONTA INATIVA] NOVO CÓDIGO GERADO PARA {data.email}: {novo_codigo}")
+        print("="*50 + "\n")
+        
+        supabase.table("user").update({
+            "verification_code": novo_codigo,
+            "verification_expires_at": novo_tempo_expiracao
+        }).eq("id", user["id"]).execute()
+        
+        # 2. Lançamos o 403, mas enviando um dicionário estruturado no 'detail'
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Esta conta ainda não foi ativada. Verifique seu e-mail."
+            detail={
+                "error": "requires_verification",
+                "email": user["email"],
+                "message": "Esta conta ainda não foi ativada. Um novo código foi gerado."
+            }
         )
     
+    # ✅ CÓDIGO ANTIGO INTACTO: Retorno padrão mantendo o response_model original
     payload_usuario = {
         "sub": str(user["id"]),
         "email": user["email"],
@@ -54,22 +73,47 @@ async def login(data: LoginRequest):
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(data: RegisterRequest):
-    user_exists = supabase.table("user").select("id").eq("email", data.email).execute()
-    
-    if user_exists.data:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Este e-mail já está cadastrado."
-        )
-    
-    senha_criptografada = obter_hash_senha(data.senha)
+    # Buscamos o id e o status de atividade do e-mail
+    user_exists = supabase.table("user").select("id, is_active").eq("email", data.email).execute()
     
     codigo_verificacao = f"{random.randint(100000, 999999)}"
-    
     tempo_expiracao = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
-    
+    senha_criptografada = obter_hash_senha(data.senha)
+
+    if user_exists.data:
+        usuario_atual = user_exists.data[0]
+        
+        # CASO 1: O usuário já existe e está ATIVO. Barra o cadastro duplicado.
+        if usuario_atual.get("is_active") == True:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Este e-mail já está cadastrado."
+            )
+        
+        # CASO 2: O usuário existe mas está INATIVO. Atualiza os dados e gera um novo código.
+        print("\n" + "="*50)
+        print(f"🔄 [REENVIO/ATUALIZAÇÃO] NOVO CÓDIGO PARA {data.email}: {codigo_verificacao}")
+        print("="*50 + "\n")
+        
+        update_response = supabase.table("user").update({
+            "nome": data.nome,
+            "senha": senha_criptografada,
+            "data_nascimento": data.data_nascimento.isoformat(),
+            "verification_code": codigo_verificacao,
+            "verification_expires_at": tempo_expiracao
+        }).eq("id", usuario_atual["id"]).execute()
+        
+        if not update_response.data:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Erro ao atualizar código de verificação. Tente novamente."
+            )
+            
+        return {"message": "Um novo código de verificação foi gerado."}
+
+    # CASO 3: Fluxo normal. Usuário totalmente novo no banco.
     print("\n" + "="*50)
-    print(f"📧 CÓDIGO DE VERIFICAÇÃO PARA {data.email}: {codigo_verificacao}")
+    print(f"📧 [NOVO CADASTRO] CÓDIGO PARA {data.email}: {codigo_verificacao}")
     print("="*50 + "\n")
     
     novo_usuario = {
@@ -95,7 +139,6 @@ async def register(data: RegisterRequest):
 
 @router.post("/verify-code", status_code=status.HTTP_200_OK)
 async def verify_code(data: VerifyCodeRequest):
-    # Busca o usuário pelo e-mail
     response = supabase.table("user").select("*").eq("email", data.email).execute()
     
     if not response.data:
@@ -119,7 +162,6 @@ async def verify_code(data: VerifyCodeRequest):
     if expires_at_str:
         expires_at = datetime.fromisoformat(expires_at_str.replace("Z", "+00:00"))
         
-
         if datetime.now(timezone.utc) > expires_at:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
