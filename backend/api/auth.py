@@ -30,9 +30,7 @@ async def login(data: LoginRequest):
             detail="E-mail ou senha incorretos"
         )
     
-    # 🔥 AQUI ESTÁ A MUDANÇA: Se a senha bateu, mas a conta está inativa
     if not user.get("is_active", False):
-        # 1. Gera e atualiza o novo código no banco antes de barrar
         novo_codigo = f"{random.randint(100000, 999999)}"
         novo_tempo_expiracao = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
         
@@ -45,7 +43,6 @@ async def login(data: LoginRequest):
             "verification_expires_at": novo_tempo_expiracao
         }).eq("id", user["id"]).execute()
         
-        # 2. Lançamos o 403, mas enviando um dicionário estruturado no 'detail'
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail={
@@ -55,7 +52,6 @@ async def login(data: LoginRequest):
             }
         )
     
-    # ✅ CÓDIGO ANTIGO INTACTO: Retorno padrão mantendo o response_model original
     payload_usuario = {
         "sub": str(user["id"]),
         "email": user["email"],
@@ -73,24 +69,28 @@ async def login(data: LoginRequest):
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(data: RegisterRequest):
-    # Buscamos o id e o status de atividade do e-mail
+    if not getattr(data, "accepted_terms", False):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Você precisa aceitar os Termos de Uso e a Política de Privacidade para se cadastrar."
+        )
+
     user_exists = supabase.table("user").select("id, is_active").eq("email", data.email).execute()
     
     codigo_verificacao = f"{random.randint(100000, 999999)}"
     tempo_expiracao = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
     senha_criptografada = obter_hash_senha(data.senha)
+    timestamp_aceite = datetime.now(timezone.utc).isoformat()
 
     if user_exists.data:
         usuario_atual = user_exists.data[0]
         
-        # CASO 1: O usuário já existe e está ATIVO. Barra o cadastro duplicado.
         if usuario_atual.get("is_active") == True:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Este e-mail já está cadastrado."
             )
         
-        # CASO 2: O usuário existe mas está INATIVO. Atualiza os dados e gera um novo código.
         print("\n" + "="*50)
         print(f"🔄 [REENVIO/ATUALIZAÇÃO] NOVO CÓDIGO PARA {data.email}: {codigo_verificacao}")
         print("="*50 + "\n")
@@ -100,7 +100,9 @@ async def register(data: RegisterRequest):
             "senha": senha_criptografada,
             "data_nascimento": data.data_nascimento.isoformat(),
             "verification_code": codigo_verificacao,
-            "verification_expires_at": tempo_expiracao
+            "verification_expires_at": tempo_expiracao,
+            "accepted_terms": True,
+            "accepted_terms_at": timestamp_aceite
         }).eq("id", usuario_atual["id"]).execute()
         
         if not update_response.data:
@@ -111,7 +113,6 @@ async def register(data: RegisterRequest):
             
         return {"message": "Um novo código de verificação foi gerado."}
 
-    # CASO 3: Fluxo normal. Usuário totalmente novo no banco.
     print("\n" + "="*50)
     print(f"📧 [NOVO CADASTRO] CÓDIGO PARA {data.email}: {codigo_verificacao}")
     print("="*50 + "\n")
@@ -124,7 +125,9 @@ async def register(data: RegisterRequest):
         "perfil": "user",
         "is_active": False, 
         "verification_code": codigo_verificacao,
-        "verification_expires_at": tempo_expiracao 
+        "verification_expires_at": tempo_expiracao,
+        "accepted_terms": True,
+        "accepted_terms_at": timestamp_aceite
     }
     
     insert_response = supabase.table("user").insert(novo_usuario).execute()

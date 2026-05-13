@@ -26,6 +26,7 @@ export interface RegisterData {
   email: string;
   senha: string;
   data_nascimento: string;
+  accepted_terms: boolean;
 }
 
 export class ApiError extends Error {
