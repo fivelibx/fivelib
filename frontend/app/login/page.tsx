@@ -134,7 +134,7 @@ export default function LoginPage() {
                       Senha
                     </Label>
                     <Link
-                      href="#"
+                      href="/esqueci-senha"
                       className="text-sm text-primary hover:underline"
                     >
                       Esqueceu a senha?
