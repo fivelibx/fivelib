@@ -2,7 +2,7 @@ import random
 from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from schemas.auth import LoginRequest, LoginResponse, RegisterRequest, VerifyCodeRequest
+from schemas.auth import LoginRequest, LoginResponse, RegisterRequest, VerifyCodeRequest, ForgotPasswordRequest, ResetPasswordRequest
 from database.config import supabase
 from api.security import obter_hash_senha, verificar_senha, criar_token_acesso
 
@@ -184,3 +184,57 @@ async def verify_code(data: VerifyCodeRequest):
         )
         
     return {"message": "Conta ativada com sucesso! Você já pode fazer login."}
+
+@router.post("/forgot-password", status_code=status.HTTP_200_OK)
+async def forgot_password(data: ForgotPasswordRequest):
+    response = supabase.table("user").select("id, is_active").eq("email", data.email).execute()
+    
+    if not response.data:
+        return {"message": "Se o e-mail estiver cadastrado, um código de recuperação será enviado."}
+        
+    user = response.data[0]
+    
+    # Gera o código de 6 dígitos e tempo de expiração (15 min)
+    codigo_recuperacao = f"{random.randint(100000, 999999)}"
+    tempo_expiracao = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
+    
+    print("\n" + "="*50)
+    print(f"🔒 [RECUPERAÇÃO DE SENHA] CÓDIGO GERADO PARA {data.email}: {codigo_recuperacao}")
+    print("="*50 + "\n")
+    
+    supabase.table("user").update({
+        "reset_password_code": codigo_recuperacao,
+        "reset_password_expires_at": tempo_expiracao
+    }).eq("id", user["id"]).execute()
+    
+    return {"message": "Código de recuperação gerado com sucesso. Verifique o terminal."}
+
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+async def reset_password(data: ResetPasswordRequest):
+    response = supabase.table("user").select("*").eq("email", data.email).execute()
+    
+    if not response.data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado.")
+        
+    user = response.data[0]
+    
+    if not user.get("reset_password_code") or user.get("reset_password_code") != data.code:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Código de recuperação inválido.")
+        
+    expires_at_str = user.get("reset_password_expires_at")
+    if expires_at_str:
+        expires_at = datetime.fromisoformat(expires_at_str.replace("Z", "+00:00"))
+        if datetime.now(timezone.utc) > expires_at:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="O código de recuperação expirou.")
+            
+    nova_senha_criptografada = obter_hash_senha(data.nova_senha)
+    
+    supabase.table("user").update({
+        "senha": nova_senha_criptografada,
+        "reset_password_code": None,
+        "reset_password_expires_at": None,
+        "is_active": True 
+    }).eq("id", user["id"]).execute()
+    
+    return {"message": "Senha redefinida com sucesso! Você já pode fazer login."}

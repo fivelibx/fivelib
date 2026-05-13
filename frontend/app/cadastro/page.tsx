@@ -11,7 +11,7 @@ import { Footer } from "@/components/footer"
 import { BookOpen, Mail, Lock, User, ArrowRight, Github, Calendar, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { register } from "../../services/api"
+import { register, RegisterData } from "../../services/api"
 
 export default function CadastroPage() {
   const router = useRouter()
@@ -48,7 +48,7 @@ export default function CadastroPage() {
         senha: password,
         data_nascimento: birthDate,
         accepted_terms: acceptTerms,
-      })
+      }as RegisterData)
 
       router.push(`/verificar-conta?email=${encodeURIComponent(email)}`)
     } catch (err: any) {

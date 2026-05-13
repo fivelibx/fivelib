@@ -29,6 +29,16 @@ export interface RegisterData {
   accepted_terms: boolean;
 }
 
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface ResetPasswordData {
+  email: string;
+  code: string;
+  nova_senha: string;
+}
+
 export class ApiError extends Error {
   status: number;
   data: any;
@@ -129,3 +139,33 @@ export async function verifyCode(data: { email: string; code: string }) {
 
   return result;
 }
+
+export const forgotPassword = async (data: ForgotPasswordData) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw { status: response.status, data: errData, message: errData?.detail || "Erro ao solicitar recuperação." };
+  }
+
+  return response.json();
+};
+
+export const resetPassword = async (data: ResetPasswordData) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw { status: response.status, data: errData, message: errData?.detail || "Erro ao redefinir senha." };
+  }
+
+  return response.json();
+};
