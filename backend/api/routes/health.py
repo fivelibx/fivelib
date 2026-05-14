@@ -3,7 +3,7 @@ from database.config import supabase
 
 router = APIRouter(tags=["health"])
 
-@router.get("")
+@router.get("/")
 def health_check():
     try:
         supabase.table("tool").select("count", count="exact").limit(1).execute()
