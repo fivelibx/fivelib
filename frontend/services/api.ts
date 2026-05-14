@@ -26,6 +26,29 @@ export interface RegisterData {
   email: string;
   senha: string;
   data_nascimento: string;
+  accepted_terms: boolean;
+}
+
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface ResetPasswordData {
+  email: string;
+  code: string;
+  nova_senha: string;
+}
+
+export class ApiError extends Error {
+  status: number;
+  data: any;
+
+  constructor(message: string, status: number, data: any) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
+  }
 }
 
 export async function getResources(): Promise<Tool[]> {
@@ -51,7 +74,12 @@ export async function login(credentials: any): Promise<AuthResponse> {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.detail || 'Falha ao realizar login');
+    
+    const errorMessage = typeof errorData.detail === 'string' 
+      ? errorData.detail 
+      : (errorData.detail?.message || 'Falha ao realizar login');
+      
+    throw new ApiError(errorMessage, response.status, errorData);
   }
 
   const data: AuthResponse = await response.json();
@@ -93,3 +121,51 @@ export async function register(userData: RegisterData): Promise<{ message: strin
 
   return data;
 }
+
+export async function verifyCode(data: { email: string; code: string }) {
+  const response = await fetch(`${API_URL}/auth/verify-code`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.detail || "Erro ao verificar código.");
+  }
+
+  return result;
+}
+
+export const forgotPassword = async (data: ForgotPasswordData) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw { status: response.status, data: errData, message: errData?.detail || "Erro ao solicitar recuperação." };
+  }
+
+  return response.json();
+};
+
+export const resetPassword = async (data: ResetPasswordData) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errData = await response.json().catch(() => ({}));
+    throw { status: response.status, data: errData, message: errData?.detail || "Erro ao redefinir senha." };
+  }
+
+  return response.json();
+};

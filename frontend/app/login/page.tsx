@@ -55,7 +55,16 @@ export default function LoginPage() {
         router.push("/dashboard")
       }
     } catch (err: any) {
-      setError(err.message || "Credenciais inválidas")
+      const errStatus = err.status;
+      const errData = err.data;
+      const detail = errData?.detail;
+
+      if (errStatus === 403 && detail && typeof detail === "object" && detail.error === "requires_verification") {
+        router.push(`/verificar-conta?email=${encodeURIComponent(detail.email)}`);
+        return;
+      }
+
+      setError(err.message || "Credenciais inválidas");
     } finally {
       setIsLoading(false)
     }
@@ -125,7 +134,7 @@ export default function LoginPage() {
                       Senha
                     </Label>
                     <Link
-                      href="#"
+                      href="/esqueci-senha"
                       className="text-sm text-primary hover:underline"
                     >
                       Esqueceu a senha?

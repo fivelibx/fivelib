@@ -11,7 +11,7 @@ import { Footer } from "@/components/footer"
 import { BookOpen, Mail, Lock, User, ArrowRight, Github, Calendar, Loader2 } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { register } from "../../services/api"
+import { register, RegisterData } from "../../services/api"
 
 export default function CadastroPage() {
   const router = useRouter()
@@ -29,7 +29,11 @@ export default function CadastroPage() {
     e.preventDefault()
     setError(null)
 
-    // Validação de senhas coincidentes no frontend
+    if (!acceptTerms) {
+      setError("Você precisa aceitar os Termos de Uso e a Política de Privacidade.")
+      return
+    }
+
     if (password !== confirmPassword) {
       setError("As senhas não coincidem.")
       return
@@ -41,12 +45,12 @@ export default function CadastroPage() {
       await register({
         nome: name,
         email: email,
-        senha: password, // Envia como 'senha' para mapear com o backend
-        data_nascimento: birthDate, // Envia como 'data_nascimento'
-      })
+        senha: password,
+        data_nascimento: birthDate,
+        accepted_terms: acceptTerms,
+      }as RegisterData)
 
-      // Redireciona para o login informando sucesso via query param
-      router.push("/login?registered=true")
+      router.push(`/verificar-conta?email=${encodeURIComponent(email)}`)
     } catch (err: any) {
       setError(err.message || "Erro ao conectar com o servidor.")
     } finally {
@@ -197,16 +201,16 @@ export default function CadastroPage() {
                   />
                   <Label
                     htmlFor="terms"
-                    className="text-sm leading-relaxed text-muted-foreground"
+                    className="text-sm leading-relaxed text-muted-foreground cursor-pointer select-none"
                   >
                     Eu concordo com os{" "}
-                    <Link href="#" className="text-primary hover:underline">
+                    <Link href="/termos" className="text-primary hover:underline" target="_blank">
                       Termos de Uso
                     </Link>{" "}
                     e{" "}
-                    <Link href="#" className="text-primary hover:underline">
+                    <Link href="/privacidade" className="text-primary hover:underline" target="_blank">
                       Política de Privacidade
-                    </Link>
+                    </Link>.
                   </Label>
                 </div>
 
