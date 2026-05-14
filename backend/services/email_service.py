@@ -5,7 +5,7 @@ from logging import getLogger
 logger = getLogger("uvicorn")
 
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
-BREVO_FROM_EMAIL = os.getenv("BREVO_FROM_EMAIL", "lucaspaiva-lp@outlook.com")
+BREVO_FROM_EMAIL = os.getenv("BREVO_FROM_EMAIL", "fivelibx@outlook.com")
 BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
 
 async def enviar_email_verificacao(email: str, codigo: str) -> bool:
