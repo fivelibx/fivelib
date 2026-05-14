@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from schemas.auth import LoginRequest, LoginResponse, RegisterRequest, VerifyCodeRequest, ForgotPasswordRequest, ResetPasswordRequest
+from services.email_service import enviar_email_verificacao
 from database.config import supabase
 from api.security import obter_hash_senha, verificar_senha, criar_token_acesso
 
@@ -38,10 +39,13 @@ async def login(data: LoginRequest):
         print(f"🔑 [LOGIN - CONTA INATIVA] NOVO CÓDIGO GERADO PARA {data.email}: {novo_codigo}")
         print("="*50 + "\n")
         
+        
         supabase.table("user").update({
             "verification_code": novo_codigo,
             "verification_expires_at": novo_tempo_expiracao
         }).eq("id", user["id"]).execute()
+        
+        await enviar_email_verificacao(email=user["email"], codigo=novo_codigo)
         
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -110,6 +114,8 @@ async def register(data: RegisterRequest):
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Erro ao atualizar código de verificação. Tente novamente."
             )
+        
+        await enviar_email_verificacao(email=data.email, codigo=codigo_verificacao)
             
         return {"message": "Um novo código de verificação foi gerado."}
 
@@ -137,6 +143,8 @@ async def register(data: RegisterRequest):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Erro ao criar conta. Tente novamente mais tarde."
         )
+    
+    await enviar_email_verificacao(email=data.email, codigo=codigo_verificacao)
     
     return {"message": "Cadastro realizado com sucesso! Verifique seu e-mail para ativar a conta."}
 
@@ -194,7 +202,6 @@ async def forgot_password(data: ForgotPasswordRequest):
         
     user = response.data[0]
     
-    # Gera o código de 6 dígitos e tempo de expiração (15 min)
     codigo_recuperacao = f"{random.randint(100000, 999999)}"
     tempo_expiracao = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
     
@@ -207,7 +214,9 @@ async def forgot_password(data: ForgotPasswordRequest):
         "reset_password_expires_at": tempo_expiracao
     }).eq("id", user["id"]).execute()
     
-    return {"message": "Código de recuperação gerado com sucesso. Verifique o terminal."}
+    await enviar_email_verificacao(email=data.email, codigo=codigo_recuperacao)
+    
+    return {"message": "Código de recuperação gerado com sucesso. Verifique seu e-mail."}
 
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
