@@ -1,4 +1,4 @@
-<img alt="FiveLib Banner" src="https://github.com/fivelibx/fivelib/blob/main/docs/assets/banner.png" href="https://fivelib.vercel.app/"/>
+[![FiveLib Banner](https://raw.githubusercontent.com/fivelibx/fivelib/main/docs/assets/banner.png)](https://fivelib.vercel.app/)
 
 <div align="center">
 <br/>
