@@ -31,7 +31,7 @@ services:
       - ./frontend:/app       # Sincroniza o código do front para hot-reload.
       - /app/node_modules     # Protege os node_modules internos do container.
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8001
+      - NEXT_PUBLIC_API_URL=http://localhost:8001/api/v1
     depends_on:
       - fivelib-api           # Garante que o front só sobe DEPOIS da API.
     restart: unless-stopped

@@ -1,4 +1,4 @@
-<img alt="FiveLib Banner" src="https://github.com/devacademicx/fivelib/blob/main/docs/assets/banner.png"/>
+<img alt="FiveLib Banner" src="https://fivelib.vercel.app"/>
 
 <div align="center">
 <br/>

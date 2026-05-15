@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import MaintenanceBanner from "@/components/maintenance-banner"
 import { 
   Search, 
   BookMarked, 
@@ -38,6 +39,12 @@ const popularLibraries = [
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col">
+      {/* 
+        AVISO DE MANUTENÇÃO
+        Para ATIVAR o aviso: Deixe a linha abaixo descomentada.
+        Para DESATIVAR: Selecione a linha e use o atalho Ctrl + / para comentar.
+      */}
+      <MaintenanceBanner />
       <Header />
       
       <main className="flex-1">
