@@ -4,6 +4,8 @@ from services.tool_service import ToolService
 from supabase import Client
 from database.base import get_supabase
 from repositories.tool_repository import ToolRepository
+from schemas.tool import ToolSchema
+from api.security import verificar_admin
 
 router = APIRouter()
 
@@ -23,3 +25,12 @@ async def increment_star(tool_id: int, db: Client = Depends(get_supabase)):
         raise HTTPException(status_code=404, detail="Ferramenta não encontrada")
         
     return {"stars": new_stars}
+@router.post("/", status_code=201)
+async def create_tool(
+    data: ToolSchema, 
+    db: Client = Depends(get_supabase),
+    admin: dict = Depends(verificar_admin)
+):
+    repository = ToolRepository(db)
+    new_tool = db.table("tools").insert(data.dict()).execute()
+    return new_tool.data
