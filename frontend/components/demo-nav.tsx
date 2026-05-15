@@ -30,7 +30,7 @@ export function DemoNav({ isLoggedIn: initialIsLoggedIn = false }: DemoNavProps)
     { href: "/cadastro", label: "Cadastro", icon: UserPlus, hideIfLogged: true },
     { href: "/busca", label: "Busca", icon: Search },
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, protected: true },
-    { href: "/admin", label: "Admin", icon: ShieldCheck, adminOnly: true },
+    { href: "/gestao-fivelib-x92", label: "Admin", icon: ShieldCheck, adminOnly: true },
     { href: "/suporte", label: "Suporte", icon: HelpCircle },
   ]
 

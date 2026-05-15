@@ -50,9 +50,9 @@ export default function LoginPage() {
       const data = await login({ email, password })
 
       if (data.role === "admin") {
-        router.push("/admin")
+        router.push("/")
       } else {
-        router.push("/dashboard")
+        router.push("/")
       }
     } catch (err: any) {
       const errStatus = err.status;
