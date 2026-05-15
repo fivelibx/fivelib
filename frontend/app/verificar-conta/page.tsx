@@ -128,12 +128,19 @@ function VerificarContaContent() {
                   )}
                 </Button>
 
-                <p className="text-center text-sm text-muted-foreground">
-                  Não recebeu o código?{" "}
-                  <Link href="/cadastro" className="font-medium text-primary hover:underline">
-                    Tentar outro e-mail
-                  </Link>
-                </p>
+                <div className="text-center space-y-1">
+                  
+                  <p className="text-sm text-muted-foreground">
+                    <Link href="/cadastro" className="font-medium text-primary hover:underline">
+                      Tentar outro e-mail
+                    </Link>
+                  </p>
+                  <br></br>
+                  <p className="text-sm text-muted-foreground">
+                    Não recebeu o código? Verifique sua caixa de{" "}
+                    <span className="font-medium text-foreground">spam</span> ou <span className="font-medium text-foreground">lixo eletrônico.</span>
+                  </p>
+                </div>
               </form>
             </CardContent>
           </Card>
