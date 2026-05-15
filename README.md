@@ -78,7 +78,7 @@ Para uma compreensão detalhada, acesse os domínios específicos abaixo:
 * [Requirements](/docs/requirements/): Definição de escopo, regras de negócio (RN), requisitos (RF/RNF) e casos de uso.
 * [Architecture](/docs/architecture/): Modelagem de dados (ERD), Dicionário de Dados e contratos de API (Swagger/OpenAPI).
 * [Infrastructure](/docs/infrastructure/): Configurações de containers Docker, redes e estratégias de implantação.
-* [**Dossier Final:**]() Compilado absoluto do projeto para auditoria acadêmica (`dossier-final.pdf`).
+* [**Dossier Final:** (Em produção)]() Compilado absoluto do projeto para auditoria acadêmica (`dossier-final.pdf`).
 
 ## Diretrizes de Desenvolvimento
 
