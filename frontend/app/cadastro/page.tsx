@@ -25,6 +25,25 @@ export default function CadastroPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const getPasswordStrength = (password: string) => {
+  if (!password) return { score: 0, label: "", color: "bg-border" }
+  
+  let points = 0
+  if (password.length >= 8) points += 1
+  if (/[A-Z]/.test(password)) points += 1
+  if (/[0-9]/.test(password)) points += 1
+  if (/[^A-Za-z0-9]/.test(password)) points += 1
+
+  switch (points) {
+    case 1: return { score: 25, label: "Fraca", color: "bg-destructive" }
+    case 2: return { score: 50, label: "Mediana", color: "bg-amber-500" }
+    case 3: return { score: 75, label: "Boa", color: "bg-blue-500" }
+    case 4: return { score: 100, label: "Forte", color: "bg-emerald-500" }
+    default: return { score: 0, label: "Fraca", color: "bg-destructive" }
+  }
+}
+
+const strength = getPasswordStrength(password)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -149,7 +168,7 @@ export default function CadastroPage() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Menores de 18 anos possuem restrições na abertura de chamados.
+                    Não é permitido cadastro de menores de 13 anos.
                   </p>
                 </div>
 
@@ -171,7 +190,19 @@ export default function CadastroPage() {
                     />
                   </div>
                 </div>
-
+                {password && (
+                  <div className="space-y-1 pt-1">
+                    <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-300 ${strength.color}`} 
+                        style={{ width: `${strength.score}%` }}
+                      />
+                    </div>
+                    <p className="text-right text-xs text-muted-foreground">
+                      Força: <span className="font-medium text-foreground">{strength.label}</span>
+                    </p>
+                  </div>
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="text-foreground">
                     Confirmar senha
@@ -232,7 +263,7 @@ export default function CadastroPage() {
                   )}
                 </Button>
               </form>
-
+              {/*
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border" />
@@ -243,7 +274,6 @@ export default function CadastroPage() {
                   </span>
                 </div>
               </div>
-
               <Button
                 variant="outline"
                 className="w-full gap-2 border-border text-foreground hover:border-primary hover:text-primary"
@@ -252,7 +282,7 @@ export default function CadastroPage() {
                 <Github className="h-4 w-4" />
                 GitHub
               </Button>
-
+              */}
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 Já tem uma conta?{" "}
                 <Link href="/login" className="font-medium text-primary hover:underline">
