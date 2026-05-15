@@ -178,7 +178,7 @@ export default function LoginPage() {
                   )}
                 </Button>
               </form>
-
+                {/*
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border" />
@@ -189,7 +189,7 @@ export default function LoginPage() {
                   </span>
                 </div>
               </div>
-
+                
               <Button
                 variant="outline"
                 className="w-full gap-2 border-border text-foreground hover:border-primary hover:text-primary"
@@ -198,7 +198,7 @@ export default function LoginPage() {
                 <Github className="h-4 w-4" />
                 GitHub
               </Button>
-
+                */}
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 Não tem uma conta?{" "}
                 <Link href="/cadastro" className="font-medium text-primary hover:underline">
