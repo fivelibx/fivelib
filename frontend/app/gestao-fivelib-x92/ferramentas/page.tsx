@@ -5,72 +5,66 @@ import { ToolPreview } from "@/components/tool-preview"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { ShieldCheck, Plus, Eye } from "lucide-react"
+import { Plus, Eye, Save } from "lucide-react"
 
-export default function GerenciarFerramentas() {
+export default function GestaoFerramentas() {
   const [formData, setFormData] = useState({
     nome: "",
     descricao: "",
     url_oficial: "",
     linguagem: "",
     stars: 0,
-    tags: [] as string[],
-    categoria: ""
+    tags: [] as string[]
   })
 
-  const [showPreview, setShowPreview] = useState(false)
+  const [showPreview, setShowPreview] = useState(true)
+
+  const handleSalvar = async () => {
+    const token = localStorage.getItem("access_token")
+    const res = await fetch("http://localhost:8001/api/v1/tools/", {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(formData)
+    })
+    
+    if (res.ok) alert("Ferramenta cadastrada com sucesso!")
+    else alert("Erro ao cadastrar. Verifique se você é admin.")
+  }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <ShieldCheck className="text-primary" /> Gestão de Ferramentas
-        </h1>
-        <p className="text-muted-foreground">Adicione ou remova recursos da biblioteca FiveLib.</p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Cadastrar Nova Ferramenta</h1>
+        <Button variant="outline" size="sm" onClick={() => setShowPreview(!showPreview)}>
+          <Eye className="mr-2 h-4 w-4" /> {showPreview ? "Ocultar Preview" : "Mostrar Preview"}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Formulário */}
         <div className="space-y-4 bg-card p-6 rounded-lg border border-border">
-          <Input 
-            placeholder="Nome da Ferramenta" 
-            onChange={(e) => setFormData({...formData, nome: e.target.value})}
-          />
-          <Textarea 
-            placeholder="Descrição curta" 
-            onChange={(e) => setFormData({...formData, descricao: e.target.value})}
-          />
+          <Input placeholder="Nome (Ex: FastAPI)" onChange={e => setFormData({...formData, nome: e.target.value})} />
+          <Textarea placeholder="Descrição..." onChange={e => setFormData({...formData, descricao: e.target.value})} />
+          <Input placeholder="URL Oficial" onChange={e => setFormData({...formData, url_oficial: e.target.value})} />
           <div className="grid grid-cols-2 gap-4">
-            <Input 
-              placeholder="Linguagem (ex: Python)" 
-              onChange={(e) => setFormData({...formData, linguagem: e.target.value})}
-            />
-            <Input 
-              placeholder="Estrelas (GitHub)" 
-              type="number"
-              onChange={(e) => setFormData({...formData, stars: parseInt(e.target.value)})}
-            />
+            <Input placeholder="Linguagem" onChange={e => setFormData({...formData, linguagem: e.target.value})} />
+            <Input type="number" placeholder="Stars" onChange={e => setFormData({...formData, stars: Number(e.target.value)})} />
           </div>
-          <Input 
-            placeholder="Tags (separadas por vírgula)" 
-            onChange={(e) => setFormData({...formData, tags: e.target.value.split(",")})}
-          />
+          <Input placeholder="Tags (separadas por vírgula)" onChange={e => setFormData({...formData, tags: e.target.value.split(",")})} />
           
-          <div className="flex gap-4 pt-4">
-            <Button className="flex-1 gap-2" onClick={() => console.log("Salvar", formData)}>
-              <Plus className="h-4 w-4" /> Cadastrar Ferramenta
-            </Button>
-            <Button variant="outline" onClick={() => setShowPreview(!showPreview)}>
-              <Eye className="h-4 w-4 mr-2" /> {showPreview ? "Ocultar Preview" : "Ver Preview"}
-            </Button>
-          </div>
+          <Button className="w-full gap-2" onClick={handleSalvar}>
+            <Save className="h-4 w-4" /> Salvar na FiveLib
+          </Button>
         </div>
 
-        {/* Preview Lateral */}
-        <div className={`transition-opacity ${showPreview ? "opacity-100" : "opacity-30 pointer-events-none"}`}>
-          <p className="text-sm font-medium mb-4 text-primary">Preview de Visualização:</p>
-          <ToolPreview data={formData} />
-        </div>
+        {showPreview && (
+          <div className="sticky top-8">
+            <p className="text-xs font-mono text-muted-foreground mb-4 uppercase tracking-widest">Visualização no Site</p>
+            <ToolPreview data={formData} />
+          </div>
+        )}
       </div>
     </div>
   )

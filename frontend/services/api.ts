@@ -51,6 +51,13 @@ export class ApiError extends Error {
   }
 }
 
+export interface DashboardStats {
+  total_usuarios: number;
+  ferramentas_ativas: number;
+  tickets_pendentes: number;
+  total_suporte: number;
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -169,3 +176,24 @@ export const resetPassword = async (data: ResetPasswordData) => {
 
   return response.json();
 };
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  
+  const response = await fetch(`${API_URL}/dashboard/stats`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new Error("Acesso não autorizado. Faça login novamente.");
+    }
+    throw new Error("Falha ao carregar os dados da dashboard.");
+  }
+
+  return response.json();
+}
