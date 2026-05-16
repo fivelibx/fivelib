@@ -29,8 +29,12 @@ import {
   AlertTriangle,
   CheckCircle,
   Mail,
-  User
+  User,
+  Loader2
 } from "lucide-react"
+
+// Importando a função do arquivo de API
+import { criarTicketSuporte } from "@/services/api" // Ajuste o caminho se necessário
 
 const faqItems = [
   {
@@ -47,15 +51,15 @@ const faqItems = [
   },
   {
     question: "Qual é a idade mínima para se cadastrar?",
-    answer: "De acordo com nossa política (RN01), o cadastro na plataforma é restrito a usuários com idade igual ou superior a 18 anos."
+    answer: "De acordo com nossa política, o cadastro na plataforma é restrito a usuários com idade igual ou superior a 13 anos."
   },
   {
     question: "Meus links privados são visíveis para outros usuários?",
-    answer: "Não. De acordo com nossa regra de negócio (RN03), as preferências e links salvos na biblioteca pessoal são vinculados ao ID do usuário e não são visíveis para outros usuários registrados ou visitantes."
+    answer: "Não. De acordo com nossas politicas de segurança, as preferências e links salvos na biblioteca pessoal são vinculados ao ID do usuário e não são visíveis para outros usuários registrados ou visitantes."
   },
   {
     question: "Quanto tempo leva para minha solicitação ser analisada?",
-    answer: "Todas as mensagens enviadas pelo formulário de suporte recebem inicialmente o status 'Pendente' e são encaminhadas para nossa equipe administrativa. O tempo médio de resposta é de 24 a 48 horas úteis."
+    answer: "Todas as mensagens enviadas pelo formulário de suporte recebem inicialmente o status 'Pendente' e são encaminhadas para nossa equipe administrativa. O tempo médio de resposta é de 48 a 72 horas úteis."
   },
 ]
 
@@ -66,20 +70,35 @@ export default function SuportePage() {
   const [section, setSection] = useState("")
   const [description, setDescription] = useState("")
   const [submitted, setSubmitted] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock submission
-    setSubmitted(true)
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setSubmitted(false)
+    setIsSubmitting(true)
+    setErrorMessage(null)
+
+    try {
+      // O backend espera: email_contato, secao_site, mensagem
+      await criarTicketSuporte({
+        email_contato: email,
+        secao_site: section,
+        mensagem: description
+      })
+
+      setSubmitted(true)
+      
+      // Reseta o formulário após sucesso
       setName("")
       setEmail("")
       setProblemType("")
       setSection("")
       setDescription("")
-    }, 3000)
+    } catch (err: any) {
+      setErrorMessage(err.message || "Ocorreu um erro ao enviar sua solicitação.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -158,12 +177,21 @@ export default function SuportePage() {
                         <h3 className="mb-2 text-lg font-medium text-foreground">
                           Mensagem enviada com sucesso!
                         </h3>
-                        <p className="text-muted-foreground">
+                        <p className="text-muted-foreground mb-6">
                           Sua solicitação foi registrada com status &quot;Pendente&quot; e será analisada pela nossa equipe.
                         </p>
+                        <Button onClick={() => setSubmitted(false)} variant="outline">
+                          Enviar outra mensagem
+                        </Button>
                       </div>
                     ) : (
                       <form onSubmit={handleSubmit} className="space-y-4">
+                        {errorMessage && (
+                          <div className="p-3 text-sm rounded bg-destructive/10 text-destructive border border-destructive/20">
+                            {errorMessage}
+                          </div>
+                        )}
+
                         <div className="space-y-2">
                           <Label htmlFor="name" className="text-foreground">
                             Nome completo
@@ -252,15 +280,25 @@ export default function SuportePage() {
                         </div>
 
                         <p className="text-xs text-muted-foreground">
-                          * O cadastro de contas e o envio de formulários através do módulo de suporte são restritos a usuários com idade igual ou superior a 18 anos (RN01).
+                          * O cadastro de contas e o envio de formulários através do módulo de suporte são restritos a usuários cadastrados no site.
                         </p>
 
                         <Button
                           type="submit"
+                          disabled={isSubmitting}
                           className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
                         >
-                          <Send className="h-4 w-4" />
-                          Enviar Solicitação
+                          {isSubmitting ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                              Enviando...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="h-4 w-4" />
+                              Enviar Solicitação
+                            </>
+                          )}
                         </Button>
                       </form>
                     )}
@@ -277,7 +315,7 @@ export default function SuportePage() {
                     <Mail className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="mb-1 font-medium text-foreground">E-mail</h3>
-                  <p className="text-sm text-muted-foreground">suporte@fivelib.com</p>
+                  <p className="text-sm text-muted-foreground">fivelibx@outlook.com</p>
                 </CardContent>
               </Card>
               <Card className="border-border bg-card">
@@ -286,7 +324,7 @@ export default function SuportePage() {
                     <MessageSquare className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="mb-1 font-medium text-foreground">Tempo de Resposta</h3>
-                  <p className="text-sm text-muted-foreground">24-48 horas úteis</p>
+                  <p className="text-sm text-muted-foreground">48-72 horas úteis</p>
                 </CardContent>
               </Card>
               <Card className="border-border bg-card">

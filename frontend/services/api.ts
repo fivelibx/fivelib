@@ -58,6 +58,12 @@ export interface DashboardStats {
   total_suporte: number;
 }
 
+export interface TicketCreateData {
+  email_contato: string;
+  secao_site: string;
+  mensagem: string;
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -193,6 +199,29 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       throw new Error("Acesso não autorizado. Faça login novamente.");
     }
     throw new Error("Falha ao carregar os dados da dashboard.");
+  }
+
+  return response.json();
+}
+
+export async function criarTicketSuporte(ticketData: TicketCreateData): Promise<any> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/tickets/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(ticketData),
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Você precisa estar autenticado para enviar uma solicitação.");
+    }
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Falha ao enviar a solicitação de suporte.");
   }
 
   return response.json();
