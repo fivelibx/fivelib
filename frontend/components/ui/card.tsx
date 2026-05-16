@@ -87,10 +87,11 @@ import Link from "next/link"
 import { api, Tool } from "@/services/api"
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/use-auth'
 
 function ToolCard({ tool }: { tool: Tool }) {
   const router = useRouter()
-  const user = null 
+  const {isLoggedIn} = useAuth()
 
   const [isFavorite, setIsFavorite] = useState(false)
   const [stars, setStars] = useState(tool.stars)
@@ -101,7 +102,7 @@ function ToolCard({ tool }: { tool: Tool }) {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!user) {
+    if (!isLoggedIn) {
       router.push('/login')
       return
     }
@@ -126,7 +127,7 @@ function ToolCard({ tool }: { tool: Tool }) {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!user) {
+    if (!isLoggedIn) {
       router.push('/login')
       return
     }
