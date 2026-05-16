@@ -24,13 +24,17 @@ export function DemoNav({ isLoggedIn: initialIsLoggedIn = false }: DemoNavProps)
     setUserRole(role)
   }, [pathname]) 
 
+  if (pathname.startsWith("/gestao-fivelib-x92")) {
+    return null
+  }
+
   const navItems = [
     { href: "/", label: "Home", icon: Home },
     { href: "/login", label: "Login", icon: LogIn, hideIfLogged: true },
     { href: "/cadastro", label: "Cadastro", icon: UserPlus, hideIfLogged: true },
     { href: "/busca", label: "Busca", icon: Search },
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, protected: true },
-    { href: "/admin", label: "Admin", icon: ShieldCheck, adminOnly: true },
+    { href: "/gestao-fivelib-x92", label: "Admin", icon: ShieldCheck, adminOnly: true },
     { href: "/suporte", label: "Suporte", icon: HelpCircle },
   ]
 
@@ -39,7 +43,10 @@ export function DemoNav({ isLoggedIn: initialIsLoggedIn = false }: DemoNavProps)
       <div className="flex items-center gap-1 rounded-full border border-border bg-card/95 px-2 py-2 shadow-lg backdrop-blur supports-backdrop-filter:bg-card/80">
         {navItems
           .filter(item => {
-            if (item.adminOnly && userRole !== 'admin') return false
+            if (item.adminOnly) {
+              const temAcessoGestao = userRole === 'superadmin' || userRole === 'admin' || userRole === 'moderador'
+              if (!temAcessoGestao) return false
+            }
             if (item.protected && !isLoggedIn) return false
             if (item.hideIfLogged && isLoggedIn) return false
             return true

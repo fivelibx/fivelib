@@ -3,11 +3,11 @@ from typing import List, Optional
 from pydantic import BaseModel
 
 class ToolSchema(BaseModel):
-    id: int
+    id: Optional[int] = None
     nome: str
     descricao: str
     url_oficial: str
-    linguagem: str
+    linguagem: Optional[str] = None
     status_ativo: bool
     stars: int
     tags: List[str]

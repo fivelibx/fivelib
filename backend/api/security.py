@@ -2,11 +2,15 @@ import os
 import bcrypt
 import jwt
 from datetime import datetime, timedelta, timezone
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from database.config import supabase
 
 SECRET_KEY = os.getenv("JWT_SECRET_KEY", "chave_padrao_desenvolvimento_local_123456")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
 def obter_hash_senha(senha: str) -> str:
     senha_bytes = senha.encode('utf-8')
@@ -48,3 +52,56 @@ def decodificar_token_acesso(token: str) -> dict:
             detail="Token de acesso inválido.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+async def obter_usuario_logado(token: str = Depends(oauth2_scheme)) -> dict:
+    return decodificar_token_acesso(token)
+
+
+async def obter_perfil_usuario(token_data: dict = Depends(obter_usuario_logado)) -> str:
+    user_id = token_data.get("sub")
+    
+    try:
+        res = supabase.table("user").select("perfil").eq("id", user_id).single().execute()
+        if not res.data:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Usuário não encontrado no sistema."
+            )
+        return res.data.get("perfil", "user")
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Falha na autenticação ou sessão inválida."
+        )
+
+async def verificar_moderador(
+    token_data: dict = Depends(obter_usuario_logado),
+    perfil: str = Depends(obter_perfil_usuario)
+) -> dict:
+    if perfil not in ["moderador", "admin", "superadmin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso negado: Requer nível mínimo de Moderador."
+        )
+    return token_data
+
+async def verificar_admin(
+    token_data: dict = Depends(obter_usuario_logado),
+    perfil: str = Depends(obter_perfil_usuario)
+) -> dict:
+    if perfil not in ["admin", "superadmin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso negado: Privilégios de Administrador requeridos."
+        )
+    return token_data
+
+async def verificar_superadmin(
+    token_data: dict = Depends(obter_usuario_logado),
+    perfil: str = Depends(obter_perfil_usuario)
+) -> dict:
+    if perfil != "superadmin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso restrito: Esta operação é exclusiva do SuperAdmin."
+        )
+    return token_data

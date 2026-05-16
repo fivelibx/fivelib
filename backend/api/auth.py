@@ -1,12 +1,13 @@
 import random
+from fastapi import APIRouter, HTTPException, status, Depends
 from datetime import datetime, timedelta, timezone
-from fastapi import APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from schemas.auth import LoginRequest, LoginResponse, RegisterRequest, VerifyCodeRequest, ForgotPasswordRequest, ResetPasswordRequest
 from services.auth_service import validar_data_nascimento
 from services.email_service import enviar_email_verificacao
 from database.config import supabase
 from api.security import obter_hash_senha, verificar_senha, criar_token_acesso
+from api.security import verificar_admin
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
@@ -174,3 +175,8 @@ async def reset_password(data: ResetPasswordRequest):
         "is_active": True
     }).eq("id", user["id"]).execute()
     return {"message": "Senha redefinida com sucesso! Você já pode fazer login."}
+@router.get("/usuarios/todos")
+async def listar_todos_usuarios(admin: dict = Depends(verificar_admin)):
+    # Se o código chegar aqui, é porque o usuário é admin.
+    # O objeto 'admin' contém os dados do token (id, email).
+    return {"status": "acesso autorizado"}
