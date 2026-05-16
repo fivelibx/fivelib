@@ -64,6 +64,26 @@ export interface TicketCreateData {
   mensagem: string;
 }
 
+export interface TicketAdminResponse {
+  id: number;
+  usuario_id: number;
+  email_contato: string;
+  secao_site: string;
+  mensagem: string;
+  status: string;
+  observacao_admin?: string;
+  criado_at: string;
+  user?: {
+    nome: string;
+    email: string;
+  };
+}
+
+export interface TicketUpdateData {
+  status: string;
+  observacao_admin?: string;
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -222,6 +242,47 @@ export async function criarTicketSuporte(ticketData: TicketCreateData): Promise<
     }
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.detail || "Falha ao enviar a solicitação de suporte.");
+  }
+
+  return response.json();
+}
+
+export async function getAdminTickets(): Promise<TicketAdminResponse[]> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/tickets/`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new Error("Acesso restrito a administradores. Faça login novamente.");
+    }
+    throw new Error("Falha ao carregar a listagem de tickets.");
+  }
+
+  return response.json();
+}
+
+export async function atualizarTicketSuporte(ticketId: number, data: TicketUpdateData): Promise<any> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/tickets/${ticketId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Falha ao atualizar o ticket.");
   }
 
   return response.json();
