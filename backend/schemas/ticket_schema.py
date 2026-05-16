@@ -31,7 +31,7 @@ class TicketAdminResponse(BaseModel):
     mensagem: str
     status: str
     criado_at: datetime
-    user: Optional[UserMinResponse] = None # Dados da tabela 'user' que virão no Join
+    user: Optional[UserMinResponse] = None
 
     class Config:
         from_attributes = True

@@ -23,7 +23,6 @@ class TicketRepository:
     
     def get_all_tickets(self) -> list[dict]:
         try:
-            # Trocamos 'descending' por 'desc' para alinhar com a versão atual da lib do Supabase
             response = self.client.table("support_ticket") \
                 .select("*, user!usuario_id(nome, email)") \
                 .order("criado_at", desc=True) \

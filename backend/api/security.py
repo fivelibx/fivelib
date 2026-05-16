@@ -55,15 +55,53 @@ def decodificar_token_acesso(token: str) -> dict:
 async def obter_usuario_logado(token: str = Depends(oauth2_scheme)) -> dict:
     return decodificar_token_acesso(token)
 
-async def verificar_admin(token_data: dict = Depends(obter_usuario_logado)) -> dict:
+
+async def obter_perfil_usuario(token_data: dict = Depends(obter_usuario_logado)) -> str:
     user_id = token_data.get("sub")
     
-    res = supabase.table("user").select("perfil").eq("id", user_id).single().execute()
-    
-    if not res.data or res.data.get("perfil") != "admin":
+    try:
+        res = supabase.table("user").select("perfil").eq("id", user_id).single().execute()
+        if not res.data:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Usuário não encontrado no sistema."
+            )
+        return res.data.get("perfil", "user")
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Falha na autenticação ou sessão inválida."
+        )
+
+async def verificar_moderador(
+    token_data: dict = Depends(obter_usuario_logado),
+    perfil: str = Depends(obter_perfil_usuario)
+) -> dict:
+    if perfil not in ["moderador", "admin", "superadmin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Acesso restrito: Esta operação requer privilégios de administrador."
+            detail="Acesso negado: Requer nível mínimo de Moderador."
         )
-    
+    return token_data
+
+async def verificar_admin(
+    token_data: dict = Depends(obter_usuario_logado),
+    perfil: str = Depends(obter_perfil_usuario)
+) -> dict:
+    if perfil not in ["admin", "superadmin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso negado: Privilégios de Administrador requeridos."
+        )
+    return token_data
+
+async def verificar_superadmin(
+    token_data: dict = Depends(obter_usuario_logado),
+    perfil: str = Depends(obter_perfil_usuario)
+) -> dict:
+    if perfil != "superadmin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso restrito: Esta operação é exclusiva do SuperAdmin."
+        )
     return token_data

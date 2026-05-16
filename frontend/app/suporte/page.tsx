@@ -33,8 +33,7 @@ import {
   Loader2
 } from "lucide-react"
 
-// Importando a função do arquivo de API
-import { criarTicketSuporte } from "@/services/api" // Ajuste o caminho se necessário
+import { criarTicketSuporte } from "@/services/api"
 
 const faqItems = [
   {
@@ -79,7 +78,6 @@ export default function SuportePage() {
     setErrorMessage(null)
 
     try {
-      // O backend espera: email_contato, secao_site, mensagem
       await criarTicketSuporte({
         email_contato: email,
         secao_site: section,
@@ -88,7 +86,7 @@ export default function SuportePage() {
 
       setSubmitted(true)
       
-      // Reseta o formulário após sucesso
+
       setName("")
       setEmail("")
       setProblemType("")

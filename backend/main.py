@@ -49,7 +49,7 @@ async def _rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded)
 # NOTE: Registro dos roteadores com o prefixo da versão.
 app.include_router(health_router, prefix="/api/v1/health")
 app.include_router(auth_router, prefix="/api/v1/auth")
-app.include_router(users_router, prefix="/api/v1/users")
+app.include_router(users_router, prefix="/api/v1/usuarios", tags=["Gestão de Usuários"])
 app.include_router(tools_router, prefix="/api/v1/resources", tags=["Tools"])
 app.include_router(dashboard_router, prefix="/api/v1/dashboard", tags=["Dashboard"])
 app.include_router(ticket_router, prefix="/api/v1/tickets", tags=["Tickets"])

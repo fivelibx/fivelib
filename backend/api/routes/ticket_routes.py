@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from typing import List
-from api.security import verificar_admin
+from api.security import obter_perfil_usuario 
 from schemas.ticket_schema import TicketAdminResponse
 
 from database.config import supabase as db_client
-from api.security import obter_usuario_logado
+from api.security import obter_usuario_logado, verificar_moderador
 from schemas.ticket_schema import TicketCreate, TicketResponse, TicketUpdateAdmin
 from repositories.ticket_repository import TicketRepository
 
@@ -37,10 +37,17 @@ async def create_support_ticket(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
         )
+
 @router.get("/", response_model=List[TicketAdminResponse])
 async def list_all_tickets(
-    admin_data: dict = Depends(verificar_admin)
+    perfil: str = Depends(obter_perfil_usuario) 
 ):
+    if perfil not in ["superadmin", "admin", "moderador"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Acesso negado: Privilégios insuficientes para visualizar os tickets."
+        )
+
     try:
         repository = TicketRepository(db_client)
         tickets = repository.get_all_tickets()
@@ -50,11 +57,12 @@ async def list_all_tickets(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Erro ao listar tickets: {str(e)}"
         )
+
 @router.patch("/{ticket_id}", response_model=TicketResponse)
 async def update_ticket(
     ticket_id: int,
     update_data: TicketUpdateAdmin,
-    admin_data: dict = Depends(verificar_admin)
+    admin_data: dict = Depends(verificar_moderador)
 ):
     try:
         repository = TicketRepository(db_client)

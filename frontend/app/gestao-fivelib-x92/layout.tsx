@@ -13,26 +13,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter()
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   useEffect(() => {
     const role = localStorage.getItem("user_role")
     const token = localStorage.getItem("access_token")
+    const temAcessoPainel = role === "superadmin" || role === "admin" || role === "moderador"
 
-    if (!token || role !== "admin") {
+    if (!token || !temAcessoPainel) {
       router.push("/") 
     } else {
+      setUserRole(role)
       setLoading(false)
     }
   }, [router])
 
   if (loading) return <div className="flex h-screen items-center justify-center bg-background text-muted-foreground text-sm">Validando credenciais...</div>
 
+  // Lista base com todos os itens mapeados
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/gestao-fivelib-x92" },
-    { name: "Usuários", icon: Users, href: "/gestao-fivelib-x92/usuarios" },
-    { name: "Ferramentas", icon: Wrench, href: "/gestao-fivelib-x92/ferramentas" },
+    { name: "Usuários", icon: Users, href: "/gestao-fivelib-x92/usuarios", adminOnly: true },
+    { name: "Ferramentas", icon: Wrench, href: "/gestao-fivelib-x92/ferramentas", adminOnly: true },
     { name: "Tickets", icon: MessageSquare, href: "/gestao-fivelib-x92/suporte" },
   ]
+
+  const menuFiltrado = menuItems.filter(item => {
+    if (item.adminOnly && userRole === "moderador") {
+      return false
+    }
+    return true
+  })
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -44,7 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
-          {menuItems.map((item) => (
+          {menuFiltrado.map((item) => (
             <Link key={item.href} href={item.href}>
               <Button
                 variant={pathname === item.href ? "secondary" : "ghost"}
