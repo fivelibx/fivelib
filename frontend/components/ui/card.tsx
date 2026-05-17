@@ -84,18 +84,22 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
 }
 import { Star, Heart, ExternalLink, BookOpen } from 'lucide-react'
 import Link from "next/link"
-import { api, Tool } from "@/services/api"
-import { useState } from 'react'
+import { api, Tool, addFavorite, removeFavorite } from "@/services/api"
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
 
-function ToolCard({ tool }: { tool: Tool }) {
+function ToolCard({ tool, initialFavorite = false }: { tool: Tool, initialFavorite?:boolean }) {
   const router = useRouter()
   const {isLoggedIn} = useAuth()
 
-  const [isFavorite, setIsFavorite] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(initialFavorite)
   const [stars, setStars] = useState(tool.stars)
   const [hasStarred, setHasStarred] = useState(false)
+
+  useEffect(()=>{
+    setIsFavorite(initialFavorite)
+  }, [initialFavorite])
 
   // -- estrela --
   const handleToggleStar = async (e: React.MouseEvent) => {
@@ -123,7 +127,7 @@ function ToolCard({ tool }: { tool: Tool }) {
   }
 
   // -- favorito --
-  const handleToggleFavorite = (e: React.MouseEvent) => {
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -131,7 +135,18 @@ function ToolCard({ tool }: { tool: Tool }) {
       router.push('/login')
       return
     }
-    setIsFavorite(!isFavorite)
+    const next = !isFavorite
+    setIsFavorite(next)
+
+    try{
+      if (next){
+        await addFavorite(tool.id)
+      } else{
+        await removeFavorite(tool.id)
+      }
+    } catch{
+      setIsFavorite(!next)
+    }
   }
 
   return (

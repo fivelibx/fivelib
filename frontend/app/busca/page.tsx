@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { getResources, Tool } from "../../services/api"
+import { getResources, Tool, getMyFavoriteIds } from "../../services/api"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, ToolCard } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { useAuth } from "@/hooks/use-auth"
 import { 
   Search, 
   Filter, 
@@ -26,6 +27,8 @@ export default function BuscaPage() {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([])
   const [showFilters, setShowFilters] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const {isLoggedIn} = useAuth()
+  const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     setMounted(true)
@@ -33,6 +36,10 @@ export default function BuscaPage() {
       try {
         const data = await getResources()
         setLibraries(data)
+        if (isLoggedIn){
+          const ids = await getMyFavoriteIds()
+          setFavoriteIds(new Set(ids))
+        }
       } catch (error) {
         console.error("Falha ao carregar bibliotecas:", error)
       } finally {
@@ -40,7 +47,7 @@ export default function BuscaPage() {
       }
     }
     loadData()
-  }, [])
+  }, [isLoggedIn])
 
   const toggleLanguage = (lang: string) => {
     setSelectedLanguages((prev) =>
@@ -153,7 +160,11 @@ export default function BuscaPage() {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {filteredLibraries.map((lib) => (
-                <ToolCard key={lib.id} tool={lib} />
+                <ToolCard
+                key={lib.id}
+                tool={lib}
+                initialFavorite={favoriteIds.has(lib.id)}
+                />
               ))}
             </div>
           </div>

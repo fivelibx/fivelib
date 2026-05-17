@@ -1,3 +1,4 @@
+//import { AuthResponse } from './api';
 const DEFAULT_API_URL = 'http://localhost:8001/api/v1';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_URL;
 
@@ -65,9 +66,69 @@ export async function login(credentials: any): Promise<AuthResponse> {
   return data;
 }
 
+function authHeaders():HeadersInit{
+  const token = 
+  typeof window !== "undefined"? localStorage.getItem("access_token") : null
+
+  if (!token){
+    throw new Error("Não autenticado")
+  }
+  return {
+    "Content-Type":"application/json",
+    Authorization: `Bearer ${token}`
+  }
+}
+
+export async function getMyFavoriteIds():Promise<number[]>{
+  const response = await fetch(`${API_URL}/users/me/favorites`,{
+    headers: authHeaders(),
+  })
+  if (response.status===401){
+    return []
+  }
+
+  if (!response.ok){
+    throw new Error("Erro ao buscar favoritos")
+  }
+  const data:{ferramenta_ids:number[]}=await response.json()
+
+  if (data.ferramenta_ids!==null && data.ferramenta_ids!==undefined){
+    return data.ferramenta_ids
+  }
+  return []
+}
+
+export async function addFavorite(ferramentaId:number):Promise<void>{
+  const response = await fetch(`${API_URL}/users/me/favorites`,{
+    method: "POST",
+    headers:  authHeaders(),
+    body: JSON.stringify({ferramenta_id:ferramentaId})
+  })
+
+  if(!response.ok){
+    const data = await response.json().catch(()=>({}))
+    throw new Error(data.detail ||"Erro ao adicionar aos favoritos")
+  }
+}
+
+export async function removeFavorite(ferramentaId:number):Promise<void>{
+  const response = await fetch(`${API_URL}/users/me/favorites/${ferramentaId}`,{
+    method: "DELETE",
+    headers: authHeaders()
+  })
+
+  if (!response.ok && response.status !== 204){
+    const data = await response.json().catch(()=>({}))
+    throw new Error(data.detail||"Erro ao deletar favorito")
+  }
+}
+
+
+
+//trocando /tools/ por /resources/
 export const api = {
   incrementStar: async (id: number) => {
-    const response = await fetch(`${API_URL}/tools/${id}/star`, {
+    const response = await fetch(`${API_URL}/resources/${id}/star`, {
       method: 'PATCH',
     });
     return response.json();
