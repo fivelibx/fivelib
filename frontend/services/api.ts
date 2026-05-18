@@ -97,6 +97,26 @@ export interface UserPerfilUpdateData {
   perfil: string;
 }
 
+export interface PrivateLink {
+  id: number;
+  titulo: string;
+  url: string;
+  descricao?: string;
+  usuario_id?: string;
+  criado_at?: string;
+}
+
+export interface PrivateLinkCreateData {
+  titulo: string;
+  url: string;
+  descricao?: string;
+}
+
+export interface DashboardBibliotecaResponse {
+  favoritos: Tool[];
+  links_privados: PrivateLink[];
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -340,4 +360,78 @@ export async function atualizarPerfilUsuario(userId: string, data: UserPerfilUpd
   }
 
   return response.json();
+}
+
+
+export async function getBibliotecaData(): Promise<DashboardBibliotecaResponse> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/dashboard`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Sessão expirada. Faça login novamente.");
+    }
+    throw new Error("Falha ao carregar os dados da biblioteca.");
+  }
+
+  return response.json();
+}
+
+export async function criarLinkPrivado(linkData: PrivateLinkCreateData): Promise<PrivateLink> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/dashboard/private-links`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(linkData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Falha ao salvar o link privado.");
+  }
+
+  return response.json();
+}
+
+export async function deletarLinkPrivado(linkId: number): Promise<void> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/dashboard/private-links/${linkId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Não foi possível remover o link privado.");
+  }
+}
+
+export async function removerFerramentaFavorita(toolId: number): Promise<void> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/dashboard/favorites/${toolId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Não foi possível remover a ferramenta dos favoritos.");
+  }
 }
