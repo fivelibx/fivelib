@@ -5,11 +5,11 @@ from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 
 # Rotas da API
-from api.routes.health import router as health_router
-from api.auth import router as auth_router
-from api.routes.users import router as users_router
-from api.routes.tools import router as tools_router
-from api.routes.dashboard import router as dashboard_router
+from api.routes.health_routes import router as health_router
+from api.routes.auth_routes import router as auth_router
+from api.routes.users_routes import router as users_router
+from api.routes.tools_routes import router as tools_router
+from api.routes.dashboard_routes import router as dashboard_router
 from api.routes.ticket_routes import router as ticket_router
 from api.routes.ticket_routes import limiter
 

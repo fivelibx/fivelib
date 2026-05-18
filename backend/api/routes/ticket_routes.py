@@ -3,11 +3,11 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from typing import List
 from api.security import obter_perfil_usuario 
-from schemas.ticket_schema import TicketAdminResponse
+from schemas.ticket import TicketAdminResponse
 
 from database.config import supabase as db_client
 from api.security import obter_usuario_logado, verificar_moderador
-from schemas.ticket_schema import TicketCreate, TicketResponse, TicketUpdateAdmin
+from schemas.ticket import TicketCreate, TicketResponse, TicketUpdateAdmin
 from repositories.ticket_repository import TicketRepository
 
 limiter = Limiter(key_func=get_remote_address)
