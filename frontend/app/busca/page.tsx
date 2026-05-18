@@ -14,7 +14,8 @@ import {
   Filter, 
   ExternalLink, 
   BookOpen,
-  X
+  X,
+  Loader2 // 💡 Importação mantida para o spinner de carregamento
 } from "lucide-react"
 
 const languages = ["JavaScript", "TypeScript", "Python", "Go", "Rust", "Java", "C#", "PHP", "Ruby"]
@@ -67,8 +68,31 @@ export default function BuscaPage() {
 
   const hasActiveFilters = selectedLanguages.length > 0 || searchQuery !== ""
 
+  // 💡 MUDANÇA VISUAL AQUI: Substituição da frase por uma animação fluida de transição
   if (!mounted || loading) {
-    return <div className="flex min-h-screen items-center justify-center">Aguarde 10 segundos para ser redirecionado...</div>
+    return (
+      <div className="flex min-h-screen flex-col bg-background">
+        <Header />
+        <div className="flex flex-1 flex-col items-center justify-center space-y-4 p-6 text-center">
+          <div className="relative flex items-center justify-center">
+            {/* Spinner giratório principal */}
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            {/* Ponto de pulsação sutil no topo do ícone */}
+            <span className="absolute top-0 right-0 flex h-2 w-2 rounded-full bg-primary animate-ping" />
+          </div>
+          
+          <div className="space-y-2 max-w-md">
+            <h3 className="text-lg font-medium text-foreground animate-pulse">
+              Despertando os servidores...
+            </h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              O ecossistema FiveLib está inicializando as instâncias de documentação. Isso pode levar alguns segundos devido ao tempo de inatividade.
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    )
   }
 
   return (
