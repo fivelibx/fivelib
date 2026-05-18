@@ -43,4 +43,18 @@ async def criar_link_privado(
 ):
     repository = DashboardRepository(db)
     service = DashboardService(repository)
+    # user["id"] vem do Supabase (que é int), passamos direto
     return service.create_private_link(user_id=user["id"], data=payload.model_dump())
+
+
+@router.delete("/private-links/{link_id}")
+async def deletar_link_privado(
+    link_id: int,  # Captura o ID da URL como inteiro
+    db: Client = Depends(get_supabase),
+    user: dict = Depends(obter_usuario_atual)
+):
+    repository = DashboardRepository(db)
+    service = DashboardService(repository)
+    
+    service.delete_private_link(user_id=user["id"], link_id=link_id)
+    return {"message": "Link privado removido com sucesso."}

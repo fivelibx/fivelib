@@ -117,6 +117,13 @@ export interface DashboardBibliotecaResponse {
   links_privados: PrivateLink[];
 }
 
+export interface UserProfile {
+  id: number
+  name: string
+  email: string
+  role: string
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -434,4 +441,25 @@ export async function removerFerramentaFavorita(toolId: number): Promise<void> {
   if (!response.ok) {
     throw new Error("Não foi possível remover a ferramenta dos favoritos.");
   }
+}
+
+export async function getPerfilUsuario(): Promise<UserProfile> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  
+  const response = await fetch(`${API_URL}/usuarios/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Sessão expirada");
+    }
+    throw new Error("Erro ao obter dados do perfil");
+  }
+
+  return response.json();
 }

@@ -51,15 +51,19 @@ class DashboardRepository:
 
     def create_private_link(self, user_id: int, data: dict) -> dict:
         payload = {
-            "usuario_id": int(user_id),
+            "usuario_id": user_id,
             "titulo": data.get("titulo"),
             "url": data.get("url")
         }
         response = self.client.table("private_link").insert(payload).execute()
         return response.data[0] if response.data else {}
 
-    def delete_private_link(self, user_id: str, link_id: int) -> None:
-        self.client.table("private_link").delete().eq("id", link_id).eq("user_id", user_id).execute()
+    def delete_private_link(self, user_id: int, link_id: int) -> None:
+        self.client.table("private_link") \
+            .delete() \
+            .eq("id", link_id) \
+            .eq("usuario_id", user_id) \
+            .execute()
 
     def remove_favorite(self, user_id: str, tool_id: int) -> None:
         self.client.table("favorite").delete().eq("user_id", user_id).eq("tool_id", tool_id).execute()

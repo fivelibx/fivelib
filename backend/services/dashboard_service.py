@@ -28,8 +28,8 @@ class DashboardService:
     def create_private_link(self, user_id: str, data: dict) -> dict:
         return self.repository.create_private_link(user_id, data)
 
-    def delete_private_link(self, user_id: str, link_id: int) -> None:
-        self.repository.delete_private_link(user_id, link_id)
+    def delete_private_link(self, user_id: int, link_id: int) -> None:
+        self.repository.delete_private_link(user_id=user_id, link_id=link_id)
 
     def remove_tool_from_favorites(self, user_id: str, tool_id: int) -> None:
         self.repository.remove_favorite(user_id, tool_id)
