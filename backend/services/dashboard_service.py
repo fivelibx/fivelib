@@ -16,3 +16,20 @@ class DashboardService:
             "tickets_pendentes": pending_tickets,
             "total_suporte": total_tickets
         }
+    def get_user_library(self, user_id: str) -> dict:
+        favoritos = self.repository.get_user_favorites(user_id)
+        links_privados = self.repository.get_user_private_links(user_id)
+        
+        return {
+            "favoritos": favoritos,
+            "links_privados": links_privados
+        }
+
+    def create_private_link(self, user_id: str, data: dict) -> dict:
+        return self.repository.create_private_link(user_id, data)
+
+    def delete_private_link(self, user_id: int, link_id: int) -> None:
+        self.repository.delete_private_link(user_id=user_id, link_id=link_id)
+
+    def remove_tool_from_favorites(self, user_id: str, tool_id: int) -> None:
+        self.repository.remove_favorite(user_id, tool_id)
