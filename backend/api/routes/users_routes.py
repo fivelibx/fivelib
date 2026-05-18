@@ -1,12 +1,12 @@
+# ID: backend/api/routes/users.py
 from fastapi import APIRouter, Depends, HTTPException, status
-from api.auth import oauth2_scheme
+from api.routes.auth_routes import oauth2_scheme
 from api.security import decodificar_token_acesso, verificar_admin, obter_perfil_usuario
 from database.config import supabase
-from schemas.auth import UserPerfilUpdate
+from schemas.user import UserPerfilUpdate
 
 router = APIRouter()
 
-# --- Dependência Existente ---
 async def obter_usuario_atual(token: str = Depends(oauth2_scheme)):
     payload = decodificar_token_acesso(token)
     
@@ -27,8 +27,6 @@ async def obter_usuario_atual(token: str = Depends(oauth2_scheme)):
         
     return response.data[0]
 
-
-# --- Rota Existente ---
 @router.get("/me")
 async def read_users_me(current_user: dict = Depends(obter_usuario_atual)):
     return {
@@ -37,7 +35,6 @@ async def read_users_me(current_user: dict = Depends(obter_usuario_atual)):
         "email": current_user["email"],
         "role": current_user["perfil"]
     }
-
 
 @router.get("/", dependencies=[Depends(verificar_admin)])
 async def listar_todos_usuarios():

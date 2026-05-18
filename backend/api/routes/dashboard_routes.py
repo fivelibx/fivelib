@@ -6,7 +6,7 @@ from api.security import obter_perfil_usuario
 from schemas.dashboard import DashboardStatsSchema, UserLibrarySchema, PrivateLinkCreateSchema, PrivateLinkSchema
 from repositories.dashboard_repository import DashboardRepository
 from services.dashboard_service import DashboardService
-from api.routes.users import obter_usuario_atual
+from api.routes.users_routes import obter_usuario_atual
 
 router = APIRouter()
 

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, User, Mail, Shield, Link2, Star, Ticket, Edit3, Github, Linkedin, Eye, EyeOff, Activity, Globe, ArrowLeft } from "lucide-react"
+import { Loader2, User, Mail, Shield, Link2, Star, Ticket, Edit3, Github, Linkedin, Eye, EyeOff, Activity, ArrowLeft } from "lucide-react"
 import { getPerfilUsuario, getBibliotecaData, getAdminTickets, type UserProfile } from "@/services/api"
 
 export default function PerfilPage() {
@@ -112,11 +112,13 @@ export default function PerfilPage() {
                 </div>
 
                 <h2 className="text-xl font-bold text-foreground truncate max-w-full">{formData.nome}</h2>
-                <p className="text-xs text-muted-foreground font-medium mt-1 px-2 line-clamp-2">
-                  {formData.titulo_profissional}
+                
+                {/* Título profissional estilizado e integrado ao bloco do nome */}
+                <p className="text-xs text-primary/90 font-medium mt-2 pt-2 border-t border-border/40 w-full max-w-[85%] line-clamp-2 tracking-wide leading-relaxed">
+                  {formData.titulo_professional}
                 </p>
 
-                {/* Bloco de Redes Sociais Lateral (Apenas Leitura/Links Rápidos) */}
+                {/* Bloco de Redes Sociais Lateral */}
                 <div className="border-t border-border/60 w-full mt-6 pt-4 text-left">
                   <span className="text-xs font-semibold text-muted-foreground block mb-3">Conexões</span>
                   <div className="space-y-2">
@@ -142,39 +144,33 @@ export default function PerfilPage() {
               </Card>
             </div>
 
-            {/* Coluna da Direita: Métricas e painel principal dinâmico */}
+            {/* Coluna da Direita: Métricas Centralizadas e painel principal dinâmico */}
             <div className="md:col-span-2 space-y-6">
               
-              {/* Cards de Métricas Rápidas */}
+              {/* Cards de Métricas Organizas e Centralizadas */}
               <div className="grid grid-cols-3 gap-4">
-                <Card className="bg-card border-border p-4 flex items-center gap-3 shadow-sm">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary hidden sm:block">
+                <Card className="bg-card border-border p-4 flex flex-col items-center justify-center text-center shadow-sm">
+                  <div className="p-2 rounded-full bg-primary/10 text-primary mb-2">
                     <Star className="h-4 w-4" />
                   </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground block">Favoritos</span>
-                    <span className="text-xl font-bold text-foreground">{stats.favoritos}</span>
-                  </div>
+                  <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">Favoritos</span>
+                  <span className="text-3xl font-extrabold text-foreground mt-1">{stats.favoritos}</span>
                 </Card>
 
-                <Card className="bg-card border-border p-4 flex items-center gap-3 shadow-sm">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary hidden sm:block">
+                <Card className="bg-card border-border p-4 flex flex-col items-center justify-center text-center shadow-sm">
+                  <div className="p-2 rounded-full bg-primary/10 text-primary mb-2">
                     <Link2 className="h-4 w-4" />
                   </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground block">Links</span>
-                    <span className="text-xl font-bold text-foreground">{stats.links}</span>
-                  </div>
+                  <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">Links</span>
+                  <span className="text-3xl font-extrabold text-foreground mt-1">{stats.links}</span>
                 </Card>
 
-                <Card className="bg-card border-border p-4 flex items-center gap-3 shadow-sm">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary hidden sm:block">
+                <Card className="bg-card border-border p-4 flex flex-col items-center justify-center text-center shadow-sm">
+                  <div className="p-2 rounded-full bg-primary/10 text-primary mb-2">
                     <Ticket className="h-4 w-4" />
                   </div>
-                  <div>
-                    <span className="text-xs text-muted-foreground block">Chamados</span>
-                    <span className="text-xl font-bold text-foreground">{stats.tickets}</span>
-                  </div>
+                  <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider block">Chamados</span>
+                  <span className="text-3xl font-extrabold text-foreground mt-1">{stats.tickets}</span>
                 </Card>
               </div>
 
@@ -193,7 +189,6 @@ export default function PerfilPage() {
                     </button>
                   </CardHeader>
                   <CardContent className="p-6">
-                    {/* Instância futura para o feed dinâmico */}
                     <div className="space-y-4">
                       <div className="flex gap-3 items-start border-l-2 border-primary/30 pl-4 relative pb-2">
                         <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-primary" />
@@ -210,7 +205,7 @@ export default function PerfilPage() {
                   </CardContent>
                 </Card>
               ) : (
-                /* MODO EDIÇÃO: Substitui o Feed temporariamente para o ajuste de dados */
+                /* MODO EDIÇÃO: Painel de Configurações Gerais */
                 <Card className="bg-card border-border shadow-md">
                   <CardHeader className="border-b border-border/60 pb-4 flex flex-row items-center justify-between space-y-0">
                     <CardTitle className="text-lg text-foreground">Editar Informações do Perfil</CardTitle>
@@ -223,7 +218,7 @@ export default function PerfilPage() {
                   <CardContent className="p-6">
                     <form onSubmit={handleSalvarPerfil} className="space-y-5">
                       
-                      {/* Bloco 1: Identidade */}
+                      {/* Identidade */}
                       <div className="grid gap-4 sm:grid-cols-2">
                         <div className="space-y-1">
                           <label className="text-xs font-medium text-muted-foreground block">Nome Completo</label>
@@ -236,13 +231,13 @@ export default function PerfilPage() {
                         </div>
                       </div>
 
-                      {/* Bloco 2: Linha de Título Personalizado */}
+                      {/* Linha de Título Personalizado */}
                       <div className="space-y-1">
                         <label className="text-xs font-medium text-muted-foreground block">Título Profissional (Bio rápida)</label>
                         <input type="text" value={formData.titulo_professional} onChange={(e) => setFormData({ ...formData, titulo_professional: e.target.value })} placeholder="Ex: Desenvolvedor Backend | Python & FastAPI" className="w-full p-2.5 rounded-lg bg-background border border-border text-sm text-foreground focus:outline-none focus:border-primary" />
                       </div>
 
-                      {/* Bloco 3: Redes Sociais */}
+                      {/* Redes Sociais */}
                       <div className="grid gap-4 sm:grid-cols-2 border-t border-border/40 pt-4">
                         <div className="space-y-1">
                           <label className="text-xs font-medium text-muted-foreground block">Usuário do GitHub</label>
@@ -261,7 +256,7 @@ export default function PerfilPage() {
                         </div>
                       </div>
 
-                      {/* Bloco 4: Segurança */}
+                      {/* Segurança */}
                       <div className="space-y-1 border-t border-border/40 pt-4">
                         <label className="text-xs font-medium text-muted-foreground block">Alterar Senha (deixe em branco para manter antiga)</label>
                         <div className="relative">

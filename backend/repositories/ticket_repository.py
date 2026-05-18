@@ -1,5 +1,5 @@
 from supabase import Client
-from schemas.ticket_schema import TicketCreate, TicketUpdateAdmin
+from schemas.ticket import TicketCreate, TicketUpdateAdmin
 
 class TicketRepository:
     def __init__(self, client: Client):

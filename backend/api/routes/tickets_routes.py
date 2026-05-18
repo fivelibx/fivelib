@@ -3,7 +3,7 @@ from supabase import Client
 
 from database.config import supabase as db_client # Seu cliente injetado ou importado
 from api.security import obter_usuario_logado      # Importando sua função de segurança
-from schemas.ticket_schema import TicketCreate, TicketResponse
+from schemas.ticket import TicketCreate, TicketResponse
 from repositories.ticket_repository import TicketRepository
 
 router = APIRouter(prefix="/api/v1/tickets", tags=["Tickets"])
