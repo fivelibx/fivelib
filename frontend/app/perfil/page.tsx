@@ -13,7 +13,7 @@ export default function PerfilPage() {
   const [loading, setLoading] = useState(true)
   const [salvandoDados, setSalvandoDados] = useState(false)
   const [salvandoSeguranca, setSalvandoSeguranca] = useState(false)
-  const [validandoCodigo, setValidandoCodigo] = useState(false) // 👈 Apenas controle de loading do token
+  const [validandoCodigo, setValidandoCodigo] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
   
   {/* Estado do Modal Customizado do FiveLib — Expandido para suportar o fluxo do token */}

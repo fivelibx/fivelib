@@ -19,7 +19,6 @@ async def obter_usuario_atual(token: str = Depends(oauth2_scheme)):
             detail="Token inválido: ID de usuário ausente no payload."
         )
         
-    # ATUALIZADO: Selecionando as novas colunas reais da tabela 'user' no Supabase
     response = supabase.table("user").select(
         "id", "nome", "email", "perfil", "titulo_profissional", "github", "linkedin"
     ).eq("id", user_id).execute()
@@ -34,7 +33,6 @@ async def obter_usuario_atual(token: str = Depends(oauth2_scheme)):
 
 @router.get("/me")
 async def read_users_me(current_user: dict = Depends(obter_usuario_atual)):
-    # ATUALIZADO: Retornando as informações persistidas reais do banco de dados
     return {
         "id": current_user["id"],
         "name": current_user["nome"],
@@ -117,7 +115,6 @@ async def atualizar_proprio_perfil(
     user_id = current_user["id"]
     email_antigo = current_user["email"]
     
-    # 1. Regra de Negócio: Bloquear alteração simultânea de e-mail e senha para evitar limbo
     tentando_alterar_email = dados_atualizacao.email and dados_atualizacao.email.lower() != email_antigo.lower()
     tentando_alterar_senha = dados_atualizacao.senha and dados_atualizacao.senha.strip() != ""
     
@@ -127,7 +124,6 @@ async def atualizar_proprio_perfil(
             detail="Por questões de segurança, altere sua senha e seu e-mail em etapas separadas."
         )
 
-    # 2. Dados cadastrais comuns
     payload_banco = {
         "nome": dados_atualizacao.nome,
         "titulo_profissional": dados_atualizacao.titulo_profissional,
@@ -135,14 +131,12 @@ async def atualizar_proprio_perfil(
         "linkedin": dados_atualizacao.linkedin
     }
     
-    # 3. Fluxo isolado de alteração de Senha (Não requer token por e-mail, pois ele já está logado)
     if tentando_alterar_senha:
         payload_banco["senha"] = obter_hash_senha(dados_atualizacao.senha)
         mensagem_sucesso = "Senha modificada com sucesso!"
     else:
         mensagem_sucesso = "Perfil atualizado com sucesso!"
 
-    # 4. Fluxo isolado de alteração de E-mail (Gera código de 6 dígitos)
     if tentando_alterar_email:
         codigo_verificacao = f"{random.randint(100000, 999999)}"
         tempo_expiracao = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
@@ -175,7 +169,7 @@ async def atualizar_proprio_perfil(
         return {
             "id": usuario_salvo["id"],
             "name": usuario_salvo["nome"],
-            "email": usuario_salvo["email"],  # Retorna o do banco (se mudou e-mail, ainda reflete o antigo até validar)
+            "email": usuario_salvo["email"],
             "role": usuario_salvo["perfil"],
             "titulo_profissional": usuario_salvo.get("titulo_profissional") or "",
             "github": usuario_salvo.get("github") or "",

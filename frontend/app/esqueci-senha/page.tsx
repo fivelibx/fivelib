@@ -41,22 +41,14 @@ export default function EsqueciSenhaPage() {
   const [step, setStep] = useState<Step>("SOLICITAR")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // Estados do fluxo
   const [email, setEmail] = useState("")
   const [code, setCode] = useState("")
   const [novaSenha, setNovaSenha] = useState("")
   const [confirmarSenha, setConfirmarSenha] = useState("")
-
-  // Estados do Reenvio de Código
   const [resendTimer, setResendTimer] = useState(0)
-
-  // Regras de validação estritas da senha
   const senhaTemTamanhoMinimo = novaSenha.length >= 8
   const senhaTemMaiuscula = /[A-Z]/.test(novaSenha)
   const senhaTemMinuscula = /[a-z]/.test(novaSenha)
-
-  // O envio só é permitido se a senha preencher todos os requisitos obrigatórios
   const senhaValidaParaEnvio = novaSenha.length > 0 && senhaTemTamanhoMinimo && senhaTemMaiuscula && senhaTemMinuscula
 
   // Controle do Timer de 60 segundos
@@ -69,7 +61,6 @@ export default function EsqueciSenhaPage() {
     }
   }, [resendTimer])
 
-  // Lógica de cálculo de força da senha atualizada igual ao Perfil e Cadastro
   const getPasswordStrength = (password: string) => {
     if (!password) return { score: 0, label: "", color: "bg-border" }
     
@@ -97,7 +88,7 @@ export default function EsqueciSenhaPage() {
 
     try {
       await forgotPassword({ email })
-      setResendTimer(60) // Inicia cooldown de 1 minuto
+      setResendTimer(60)
       if (step !== "REDEFINIR") setStep("REDEFINIR")
     } catch (err: any) {
       if (err.data && Array.isArray(err.data.detail)) {

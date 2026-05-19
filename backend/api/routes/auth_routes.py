@@ -184,7 +184,6 @@ async def listar_todos_usuarios(admin: dict = Depends(verificar_admin)):
 
 @router.post("/verify-new-email", status_code=status.HTTP_200_OK)
 async def verify_new_email(data: VerifyCodeRequest):
-    # Procure o usuário que possui esse código guardado temporariamente
     response = supabase.table("user").select("*").eq("verification_code", data.code).execute()
     
     if not response.data:
@@ -195,7 +194,6 @@ async def verify_new_email(data: VerifyCodeRequest):
         
     user = response.data[0]
     
-    # Validação de expiração idêntica ao seu método verify_code original
     expires_at_str = user.get("verification_expires_at")
     if expires_at_str:
         expires_at = datetime.fromisoformat(expires_at_str.replace("Z", "+00:00"))
@@ -205,9 +203,8 @@ async def verify_new_email(data: VerifyCodeRequest):
                 detail="O código de verificação expirou. Solicite a alteração novamente no seu perfil."
             )
             
-    # Código válido! Atualiza o e-mail definitivo e limpa os campos de controle
     update_response = supabase.table("user").update({
-        "email": data.email.lower(), # Grava o novo e-mail validado
+        "email": data.email.lower(),
         "verification_code": None,
         "verification_expires_at": None
     }).eq("id", user["id"]).execute()
