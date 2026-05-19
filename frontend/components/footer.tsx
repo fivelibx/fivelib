@@ -60,7 +60,7 @@ export function Footer() {
               </li>
               <li>
                 <Link href="/sobre" className="text-muted-foreground transition-colors hover:text-primary">
-                  Sobre
+                  Sobre nós
                 </Link>
               </li>
 
