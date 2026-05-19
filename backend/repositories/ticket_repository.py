@@ -22,6 +22,7 @@ class TicketRepository:
         return response.data[0]
     
     def get_all_tickets(self) -> list[dict]:
+        """Retorna todos os tickets do banco (Painel Admin) com o relacionamento do usuário."""
         try:
             response = self.client.table("support_ticket") \
                 .select("*, user!usuario_id(nome, email)") \
@@ -34,6 +35,7 @@ class TicketRepository:
             print(f"ERRO REAL DO SUPABASE NO GET TICKETS: {str(e)}")
             print("🚨" * 20 + "\n")
             raise e
+
     def update_ticket_status(self, ticket_id: int, update_data: TicketUpdateAdmin) -> dict:
         up_data = {
             "status": update_data.status,
@@ -49,3 +51,17 @@ class TicketRepository:
             raise Exception("Ticket não encontrado ou falha ao atualizar no banco de dados.")
             
         return response.data[0]
+
+    def get_tickets_by_user(self, usuario_id: int) -> list[dict]:
+        """Retorna apenas os tickets vinculados ao usuário logado."""
+        try:
+            response = self.client.table("support_ticket") \
+                .select("*") \
+                .eq("usuario_id", usuario_id) \
+                .order("criado_at", desc=True) \
+                .execute()
+                
+            return response.data if response.data is not None else []
+            
+        except Exception as e:
+            raise Exception(f"Erro ao consultar o Supabase: {str(e)}")

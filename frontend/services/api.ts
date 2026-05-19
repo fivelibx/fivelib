@@ -133,6 +133,16 @@ export interface UserProfileUpdateInput {
   linkedin?: string | null;
 }
 
+export interface UserTicketResponse {
+  id: number;
+  email_contato: string;
+  secao_site: string;
+  mensagem: string;
+  status: string;
+  observacao_admin?: string;
+  criado_at: string;
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -501,6 +511,27 @@ export async function updatePerfilUsuario(dados: UserProfileUpdateInput): Promis
     }
     
     throw new Error(errorMessage);
+  }
+
+  return response.json();
+}
+
+export async function getMeusTickets(): Promise<UserTicketResponse[]> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  
+  const response = await fetch(`${API_URL}/tickets/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Sessão expirada. Faça login novamente.");
+    }
+    throw new Error("Falha ao carregar seus chamados.");
   }
 
   return response.json();
