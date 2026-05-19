@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { BookOpen, Github, Twitter, Linkedin } from "lucide-react"
+import { BookOpen, Github } from "lucide-react"
 
 export function Footer() {
   return (
@@ -21,18 +21,16 @@ export function Footer() {
               Encontre tudo que você precisa para acelerar seu aprendizado.
             </p>
             <div className="mt-4 flex gap-4">
-              <Link href="#" className="text-muted-foreground transition-colors hover:text-primary">
+              <Link href="https://github.com/fivelibx" className="text-muted-foreground transition-colors hover:text-primary">
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </Link>
-              <Link href="#" className="text-muted-foreground transition-colors hover:text-primary">
-                <Twitter className="h-5 w-5" />
-                <span className="sr-only">Twitter</span>
-              </Link>
+              {/*
               <Link href="#" className="text-muted-foreground transition-colors hover:text-primary">
                 <Linkedin className="h-5 w-5" />
                 <span className="sr-only">LinkedIn</span>
               </Link>
+              */}
             </div>
           </div>
 
@@ -60,6 +58,12 @@ export function Footer() {
                   Suporte
                 </Link>
               </li>
+              <li>
+                <Link href="/sobre" className="text-muted-foreground transition-colors hover:text-primary">
+                  Sobre
+                </Link>
+              </li>
+
             </ul>
           </div>
 
@@ -89,7 +93,7 @@ export function Footer() {
         <div className="mt-12 border-t border-border pt-6 text-center text-sm text-muted-foreground">
           <p>&copy; 2026 FiveLib. Todos os direitos reservados.</p>
           <p className="mt-1">
-            Desenvolvido por Mateus Alves, Lucas Paiva, Nicolas R. Santos, Felipe Gonçalves e Rodrigo Moraes
+            Desenvolvido por Fivelibx
           </p>
         </div>
       </div>
