@@ -1,9 +1,11 @@
-# ID: backend/api/routes/users.py
+import random
 from fastapi import APIRouter, Depends, HTTPException, status
 from api.routes.auth_routes import oauth2_scheme
-from api.security import decodificar_token_acesso, verificar_admin, obter_perfil_usuario
+from api.security import decodificar_token_acesso, verificar_admin, obter_perfil_usuario, obter_hash_senha
 from database.config import supabase
-from schemas.user import UserPerfilUpdate
+from schemas.user import UserPerfilUpdate, UserUpdateSelf
+from datetime import datetime, timedelta, timezone
+from services.email_service import enviar_email_verificacao
 
 router = APIRouter()
 
@@ -17,7 +19,10 @@ async def obter_usuario_atual(token: str = Depends(oauth2_scheme)):
             detail="Token inválido: ID de usuário ausente no payload."
         )
         
-    response = supabase.table("user").select("id", "nome", "email", "perfil").eq("id", user_id).execute()
+    # ATUALIZADO: Selecionando as novas colunas reais da tabela 'user' no Supabase
+    response = supabase.table("user").select(
+        "id", "nome", "email", "perfil", "titulo_profissional", "github", "linkedin"
+    ).eq("id", user_id).execute()
     
     if not response.data:
         raise HTTPException(
@@ -29,11 +34,15 @@ async def obter_usuario_atual(token: str = Depends(oauth2_scheme)):
 
 @router.get("/me")
 async def read_users_me(current_user: dict = Depends(obter_usuario_atual)):
+    # ATUALIZADO: Retornando as informações persistidas reais do banco de dados
     return {
         "id": current_user["id"],
         "name": current_user["nome"],
         "email": current_user["email"],
-        "role": current_user["perfil"]
+        "role": current_user["perfil"],
+        "titulo_profissional": current_user.get("titulo_profissional") or "",
+        "github": current_user.get("github") or "",
+        "linkedin": current_user.get("linkedin") or ""
     }
 
 @router.get("/", dependencies=[Depends(verificar_admin)])
@@ -93,9 +102,89 @@ async def alterar_perfil_usuario(
         if not response.data:
             raise HTTPException(status_code=404, detail="Usuário não encontrado.")
             
-        return {"message": "Perfil atualizado com sucesso", "usuario": response.data[0]}
+        return {"message": "Perfil updated com sucesso", "usuario": response.data[0]}
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
+        )
+
+@router.put("/me")
+async def atualizar_proprio_perfil(
+    dados_atualizacao: UserUpdateSelf,
+    current_user: dict = Depends(obter_usuario_atual)
+):
+    user_id = current_user["id"]
+    email_antigo = current_user["email"]
+    
+    # 1. Regra de Negócio: Bloquear alteração simultânea de e-mail e senha para evitar limbo
+    tentando_alterar_email = dados_atualizacao.email and dados_atualizacao.email.lower() != email_antigo.lower()
+    tentando_alterar_senha = dados_atualizacao.senha and dados_atualizacao.senha.strip() != ""
+    
+    if tentando_alterar_email and tentando_alterar_senha:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Por questões de segurança, altere sua senha e seu e-mail em etapas separadas."
+        )
+
+    # 2. Dados cadastrais comuns
+    payload_banco = {
+        "nome": dados_atualizacao.nome,
+        "titulo_profissional": dados_atualizacao.titulo_profissional,
+        "github": dados_atualizacao.github,
+        "linkedin": dados_atualizacao.linkedin
+    }
+    
+    # 3. Fluxo isolado de alteração de Senha (Não requer token por e-mail, pois ele já está logado)
+    if tentando_alterar_senha:
+        payload_banco["senha"] = obter_hash_senha(dados_atualizacao.senha)
+        mensagem_sucesso = "Senha modificada com sucesso!"
+    else:
+        mensagem_sucesso = "Perfil atualizado com sucesso!"
+
+    # 4. Fluxo isolado de alteração de E-mail (Gera código de 6 dígitos)
+    if tentando_alterar_email:
+        codigo_verificacao = f"{random.randint(100000, 999999)}"
+        tempo_expiracao = (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat()
+        
+        print("\n" + "="*50)
+        print(f"📧 [ALTERAÇÃO DE EMAIL] CÓDIGO GERADO PARA {dados_atualizacao.email.lower()}: {codigo_verificacao}")
+        print("="*50 + "\n")
+        
+        payload_banco["verification_code"] = codigo_verificacao
+        payload_banco["verification_expires_at"] = tempo_expiracao
+        
+        try:
+            await enviar_email_verificacao(email=dados_atualizacao.email.lower(), codigo=codigo_verificacao)
+            mensagem_sucesso = "Código de confirmação enviado! Verifique sua nova caixa de entrada para validar a alteração."
+        except Exception as mail_err:
+            print(f"Erro ao disparar e-mail: {str(mail_err)}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Dados cadastrais salvos, mas falhou o envio do e-mail de verificação."
+            )
+
+    try:
+        response = supabase.table("user").update(payload_banco).eq("id", user_id).execute()
+        
+        if not response.data:
+            raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+            
+        usuario_salvo = response.data[0]
+        
+        return {
+            "id": usuario_salvo["id"],
+            "name": usuario_salvo["nome"],
+            "email": usuario_salvo["email"],  # Retorna o do banco (se mudou e-mail, ainda reflete o antigo até validar)
+            "role": usuario_salvo["perfil"],
+            "titulo_profissional": usuario_salvo.get("titulo_profissional") or "",
+            "github": usuario_salvo.get("github") or "",
+            "linkedin": usuario_salvo.get("linkedin") or "",
+            "detail": mensagem_sucesso
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Erro ao atualizar o perfil: {str(e)}"
         )

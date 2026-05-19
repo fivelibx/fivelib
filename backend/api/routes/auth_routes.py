@@ -181,3 +181,41 @@ async def reset_password(data: ResetPasswordRequest):
 @router.get("/usuarios/todos")
 async def listar_todos_usuarios(admin: dict = Depends(verificar_admin)):
     return {"status": "acesso authorized"}
+
+@router.post("/verify-new-email", status_code=status.HTTP_200_OK)
+async def verify_new_email(data: VerifyCodeRequest):
+    # Procure o usuário que possui esse código guardado temporariamente
+    response = supabase.table("user").select("*").eq("verification_code", data.code).execute()
+    
+    if not response.data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Código de verificação incorreto ou expirado."
+        )
+        
+    user = response.data[0]
+    
+    # Validação de expiração idêntica ao seu método verify_code original
+    expires_at_str = user.get("verification_expires_at")
+    if expires_at_str:
+        expires_at = datetime.fromisoformat(expires_at_str.replace("Z", "+00:00"))
+        if datetime.now(timezone.utc) > expires_at:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="O código de verificação expirou. Solicite a alteração novamente no seu perfil."
+            )
+            
+    # Código válido! Atualiza o e-mail definitivo e limpa os campos de controle
+    update_response = supabase.table("user").update({
+        "email": data.email.lower(), # Grava o novo e-mail validado
+        "verification_code": None,
+        "verification_expires_at": None
+    }).eq("id", user["id"]).execute()
+    
+    if not update_response.data:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail="Erro ao atualizar endereço de e-mail. Tente novamente."
+        )
+        
+    return {"message": "E-mail atualizado com sucesso! Use suas novas credenciais no próximo login."}

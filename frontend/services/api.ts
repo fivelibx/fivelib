@@ -124,6 +124,15 @@ export interface UserProfile {
   role: string
 }
 
+export interface UserProfileUpdateInput {
+  nome: string;
+  email: string;
+  senha?: string | null;
+  titulo_profissional?: string | null;
+  github?: string | null;
+  linkedin?: string | null;
+}
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -459,6 +468,39 @@ export async function getPerfilUsuario(): Promise<UserProfile> {
       throw new Error("Sessão expirada");
     }
     throw new Error("Erro ao obter dados do perfil");
+  }
+
+  return response.json();
+}
+
+export async function updatePerfilUsuario(dados: UserProfileUpdateInput): Promise<any> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/usuarios/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(dados),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    
+    // Extrai a mensagem de erro legível se for um objeto ou array do Pydantic
+    let errorMessage = "Falha ao atualizar dados do perfil.";
+    if (errorData.detail) {
+      if (typeof errorData.detail === "string") {
+        errorMessage = errorData.detail;
+      } else if (Array.isArray(errorData.detail) && errorData.detail[0]?.msg) {
+        errorMessage = `${errorData.detail[0].loc.join(".")} : ${errorData.detail[0].msg}`;
+      } else if (typeof errorData.detail === "object") {
+        errorMessage = errorData.detail.message || JSON.stringify(errorData.detail);
+      }
+    }
+    
+    throw new Error(errorMessage);
   }
 
   return response.json();
