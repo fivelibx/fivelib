@@ -9,12 +9,18 @@ from api.security import verificar_admin, obter_perfil_usuario
 
 router = APIRouter()
 
+# ============================================================
+# LISTAR FERRAMENTAS
+# ============================================================
 @router.get("/")
 async def get_tools(db: Client = Depends(get_supabase)):
     repository = ToolRepository(db)
     return repository.get_all()
 
 
+# ============================================================
+# INCREMENTAR STARS
+# ============================================================
 @router.patch("/{tool_id}/star")
 async def increment_star(tool_id: int, db: Client = Depends(get_supabase)):
     repository = ToolRepository(db)
@@ -27,6 +33,9 @@ async def increment_star(tool_id: int, db: Client = Depends(get_supabase)):
     return {"stars": new_stars}
 
 
+# ============================================================
+# CRIAR FERRAMENTA — RESTRITO A ADMIN
+# ============================================================
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_tool(
     data: ToolSchema, 
@@ -48,6 +57,9 @@ async def create_tool(
         )
 
 
+# ============================================================
+# REMOVER FERRAMENTA — RESTRITO A ADMIN/SUPERADMIN
+# ============================================================
 @router.delete("/{tool_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_resource(
     tool_id: int,

@@ -1,6 +1,10 @@
 const DEFAULT_API_URL = 'http://localhost:8001/api/v1';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_URL;
 
+// ============================================================
+// INTERFACES — TIPOS E MODELOS DE DADOS
+// ============================================================
+
 export interface Tool {
   id: number;
   nome: string;      
@@ -37,18 +41,6 @@ export interface ResetPasswordData {
   email: string;
   code: string;
   nova_senha: string;
-}
-
-export class ApiError extends Error {
-  status: number;
-  data: any;
-
-  constructor(message: string, status: number, data: any) {
-    super(message);
-    this.name = 'ApiError';
-    this.status = status;
-    this.data = data;
-  }
 }
 
 export interface DashboardStats {
@@ -97,6 +89,72 @@ export interface UserPerfilUpdateData {
   perfil: string;
 }
 
+export interface PrivateLink {
+  id: number;
+  titulo: string;
+  url: string;
+  descricao?: string;
+  usuario_id?: string;
+  criado_at?: string;
+}
+
+export interface PrivateLinkCreateData {
+  titulo: string;
+  url: string;
+  descricao?: string;
+}
+
+export interface DashboardBibliotecaResponse {
+  favoritos: Tool[];
+  links_privados: PrivateLink[];
+}
+
+export interface UserProfile {
+  id: number
+  name: string
+  email: string
+  role: string
+}
+
+export interface UserProfileUpdateInput {
+  nome: string;
+  email: string;
+  senha?: string | null;
+  titulo_profissional?: string | null;
+  github?: string | null;
+  linkedin?: string | null;
+}
+
+export interface UserTicketResponse {
+  id: number;
+  email_contato: string;
+  secao_site: string;
+  mensagem: string;
+  status: string;
+  observacao_admin?: string;
+  criado_at: string;
+}
+
+// ============================================================
+// CLASSE DE ERRO CUSTOMIZADO
+// ============================================================
+
+export class ApiError extends Error {
+  status: number;
+  data: any;
+
+  constructor(message: string, status: number, data: any) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
+  }
+}
+
+// ============================================================
+// RECURSOS PÚBLICOS — /resources
+// ============================================================
+
 export async function getResources(): Promise<Tool[]> {
   const response = await fetch(`${API_URL}/resources`);
   
@@ -106,6 +164,10 @@ export async function getResources(): Promise<Tool[]> {
   
   return response.json();
 }
+
+// ============================================================
+// AUTENTICAÇÃO — /auth
+// ============================================================
 
 export async function login(credentials: any): Promise<AuthResponse> {
   const url = `${API_URL}/auth/login`.replace(/([^:]\/)\/+/g, "$1");
@@ -138,15 +200,6 @@ export async function login(credentials: any): Promise<AuthResponse> {
 
   return data;
 }
-
-export const api = {
-  incrementStar: async (id: number) => {
-    const response = await fetch(`${API_URL}/tools/${id}/star`, {
-      method: 'PATCH',
-    });
-    return response.json();
-  }
-};
 
 export async function register(userData: RegisterData): Promise<{ message: string }> {
   const url = `${API_URL}/auth/register`.replace(/([^:]\/)\/+/g, "$1");
@@ -216,6 +269,10 @@ export const resetPassword = async (data: ResetPasswordData) => {
   return response.json();
 };
 
+// ============================================================
+// DASHBOARD DO USUÁRIO — /dashboard
+// ============================================================
+
 export async function getDashboardStats(): Promise<DashboardStats> {
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
   
@@ -236,6 +293,140 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
   return response.json();
 }
+
+export async function getBibliotecaData(): Promise<DashboardBibliotecaResponse> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/dashboard`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Sessão expirada. Faça login novamente.");
+    }
+    throw new Error("Falha ao carregar os dados da biblioteca.");
+  }
+
+  return response.json();
+}
+
+export async function criarLinkPrivado(linkData: PrivateLinkCreateData): Promise<PrivateLink> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/dashboard/private-links`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(linkData),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || "Falha ao salvar o link privado.");
+  }
+
+  return response.json();
+}
+
+export async function deletarLinkPrivado(linkId: number): Promise<void> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/dashboard/private-links/${linkId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Não foi possível remover o link privado.");
+  }
+}
+
+export async function removerFerramentaFavorita(toolId: number): Promise<void> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/dashboard/favorites/${toolId}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Não foi possível remover a ferramenta dos favoritos.");
+  }
+}
+
+// ============================================================
+// PERFIL DO USUÁRIO — /usuarios
+// ============================================================
+
+export async function getPerfilUsuario(): Promise<UserProfile> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  
+  const response = await fetch(`${API_URL}/usuarios/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Sessão expirada");
+    }
+    throw new Error("Erro ao obter dados do perfil");
+  }
+
+  return response.json();
+}
+
+export async function updatePerfilUsuario(dados: UserProfileUpdateInput): Promise<any> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/usuarios/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(dados),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    
+    let errorMessage = "Falha ao atualizar dados do perfil.";
+    if (errorData.detail) {
+      if (typeof errorData.detail === "string") {
+        errorMessage = errorData.detail;
+      } else if (Array.isArray(errorData.detail) && errorData.detail[0]?.msg) {
+        errorMessage = `${errorData.detail[0].loc.join(".")} : ${errorData.detail[0].msg}`;
+      } else if (typeof errorData.detail === "object") {
+        errorMessage = errorData.detail.message || JSON.stringify(errorData.detail);
+      }
+    }
+    
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+}
+
+// ============================================================
+// TICKETS DE SUPORTE — /tickets
+// ============================================================
 
 export async function criarTicketSuporte(ticketData: TicketCreateData): Promise<any> {
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
@@ -259,6 +450,31 @@ export async function criarTicketSuporte(ticketData: TicketCreateData): Promise<
 
   return response.json();
 }
+
+export async function getMeusTickets(): Promise<UserTicketResponse[]> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  
+  const response = await fetch(`${API_URL}/tickets/me`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Sessão expirada. Faça login novamente.");
+    }
+    throw new Error("Falha ao carregar seus chamados.");
+  }
+
+  return response.json();
+}
+
+// ============================================================
+// ADMINISTRAÇÃO — /tickets e /usuarios (admin only)
+// ============================================================
 
 export async function getAdminTickets(): Promise<TicketAdminResponse[]> {
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
@@ -341,3 +557,16 @@ export async function atualizarPerfilUsuario(userId: string, data: UserPerfilUpd
 
   return response.json();
 }
+
+// ============================================================
+// MISCELÂNEA
+// ============================================================
+
+export const api = {
+  incrementStar: async (id: number) => {
+    const response = await fetch(`${API_URL}/tools/${id}/star`, {
+      method: 'PATCH',
+    });
+    return response.json();
+  }
+};

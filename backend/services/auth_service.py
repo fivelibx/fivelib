@@ -1,6 +1,9 @@
 from datetime import date
 
 
+# ============================================================
+# VALIDAÇÃO DE REGRA DE NEGÓCIO (RN01 — IDADE MÍNIMA/MÁXIMA)
+# ============================================================
 def validar_data_nascimento(data_nascimento: date) -> None:
     """
     Valida a data de nascimento conforme RN01:
