@@ -9,6 +9,9 @@ from services.email_service import enviar_email_verificacao
 
 router = APIRouter()
 
+# ============================================================
+# DEPENDÊNCIA — OBTER USUÁRIO ATUAL
+# ============================================================
 async def obter_usuario_atual(token: str = Depends(oauth2_scheme)):
     payload = decodificar_token_acesso(token)
     
@@ -31,6 +34,9 @@ async def obter_usuario_atual(token: str = Depends(oauth2_scheme)):
         
     return response.data[0]
 
+# ============================================================
+# LER PERFIL DO USUÁRIO LOGADO
+# ============================================================
 @router.get("/me")
 async def read_users_me(current_user: dict = Depends(obter_usuario_atual)):
     return {
@@ -43,6 +49,9 @@ async def read_users_me(current_user: dict = Depends(obter_usuario_atual)):
         "linkedin": current_user.get("linkedin") or ""
     }
 
+# ============================================================
+# LISTAR TODOS OS USUÁRIOS — RESTRITO A ADMIN
+# ============================================================
 @router.get("/", dependencies=[Depends(verificar_admin)])
 async def listar_todos_usuarios():
     try:
@@ -57,6 +66,9 @@ async def listar_todos_usuarios():
             detail=f"Erro ao listar usuários: {str(e)}"
         )
 
+# ============================================================
+# ALTERAR PERFIL/CARGO DE UM USUÁRIO — CONTROLE DE ACESSO
+# ============================================================
 @router.patch("/{user_id}/perfil")
 async def alterar_perfil_usuario(
     user_id: str,
@@ -107,6 +119,9 @@ async def alterar_perfil_usuario(
             detail=str(e)
         )
 
+# ============================================================
+# ATUALIZAR DADOS DO PRÓPRIO PERFIL — USUÁRIO LOGADO
+# ============================================================
 @router.put("/me")
 async def atualizar_proprio_perfil(
     dados_atualizacao: UserUpdateSelf,

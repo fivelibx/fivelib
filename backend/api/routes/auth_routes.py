@@ -1,4 +1,3 @@
-# ID: backend/api/auth.py
 import random
 from fastapi import APIRouter, HTTPException, status, Depends
 from datetime import datetime, timedelta, timezone
@@ -10,11 +9,15 @@ from services.email_service import enviar_email_verificacao
 from database.config import supabase
 from api.security import obter_hash_senha, verificar_senha, criar_token_acesso
 from api.security import verificar_admin
-
+ 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
-
+ 
 router = APIRouter(tags=["auth"])
-
+ 
+# ============================================================
+# AUTENTICAÇÃO — LOGIN E SESSÃO
+# ============================================================
+ 
 @router.post("/login", response_model=LoginResponse)
 async def login(data: LoginRequest):
     response = supabase.table("user").select("*").eq("email", data.email).execute()
@@ -55,14 +58,18 @@ async def login(data: LoginRequest):
         "role": user["perfil"],
         "name": user["nome"]
     }
-
+ 
+# ============================================================
+# CADASTRO E ATIVAÇÃO DE CONTA
+# ============================================================
+ 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(data: RegisterRequest):
     try:
         validar_data_nascimento(data.data_nascimento)
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-
+ 
     if not getattr(data, "accepted_terms", False):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -113,7 +120,7 @@ async def register(data: RegisterRequest):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Erro ao criar conta. Tente novamente mais tarde.")
     await enviar_email_verificacao(email=data.email, codigo=codigo_verificacao)
     return {"message": "Cadastro realizado com sucesso! Verifique seu e-mail para ativar a conta."}
-
+ 
 @router.post("/verify-code", status_code=status.HTTP_200_OK)
 async def verify_code(data: VerifyCodeRequest):
     response = supabase.table("user").select("*").eq("email", data.email).execute()
@@ -137,7 +144,11 @@ async def verify_code(data: VerifyCodeRequest):
     if not update_response.data:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Erro ao ativar a conta. Tente novamente.")
     return {"message": "Conta ativada com sucesso! Você já pode fazer login."}
-
+ 
+# ============================================================
+# RECUPERAÇÃO DE SENHA
+# ============================================================
+ 
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
 async def forgot_password(data: ForgotPasswordRequest):
     response = supabase.table("user").select("id, is_active").eq("email", data.email).execute()
@@ -155,7 +166,7 @@ async def forgot_password(data: ForgotPasswordRequest):
     }).eq("id", user["id"]).execute()
     await enviar_email_verificacao(email=data.email, codigo=codigo_recuperacao)
     return {"message": "Código de recuperação gerado com sucesso. Verifique seu e-mail."}
-
+ 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
 async def reset_password(data: ResetPasswordRequest):
     response = supabase.table("user").select("*").eq("email", data.email).execute()
@@ -177,11 +188,11 @@ async def reset_password(data: ResetPasswordRequest):
         "is_active": True
     }).eq("id", user["id"]).execute()
     return {"message": "Senha redefinida com sucesso! Você já pode fazer login."}
-
-@router.get("/usuarios/todos")
-async def listar_todos_usuarios(admin: dict = Depends(verificar_admin)):
-    return {"status": "acesso authorized"}
-
+ 
+# ============================================================
+# ATUALIZAÇÃO DE E-MAIL
+# ============================================================
+ 
 @router.post("/verify-new-email", status_code=status.HTTP_200_OK)
 async def verify_new_email(data: VerifyCodeRequest):
     response = supabase.table("user").select("*").eq("verification_code", data.code).execute()
@@ -216,3 +227,11 @@ async def verify_new_email(data: VerifyCodeRequest):
         )
         
     return {"message": "E-mail atualizado com sucesso! Use suas novas credenciais no próximo login."}
+ 
+# ============================================================
+# ADMINISTRAÇÃO — RESTRITO A ADMIN
+# ============================================================
+ 
+@router.get("/usuarios/todos")
+async def listar_todos_usuarios(admin: dict = Depends(verificar_admin)):
+    return {"status": "acesso authorized"}

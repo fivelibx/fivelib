@@ -10,7 +10,9 @@ from repositories.ticket_repository import TicketRepository
 limiter = Limiter(key_func=get_remote_address)
 router = APIRouter()
 
+# ============================================================
 # 1. CRIAR CHAMADO
+# ============================================================
 @router.post("/", response_model=TicketResponse, status_code=status.HTTP_201_CREATED)
 @limiter.limit("3/5 minutes")
 async def create_support_ticket(
@@ -28,7 +30,9 @@ async def create_support_ticket(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-# 2. MEUS CHAMADOS — /me ANTES de / para não ter conflito
+# ============================================================
+# 2. MEUS CHAMADOS —
+# ============================================================
 @router.get("/me", response_model=List[TicketResponse], status_code=status.HTTP_200_OK)
 async def get_my_support_tickets(
     token_data: dict = Depends(obter_usuario_logado)
@@ -43,7 +47,9 @@ async def get_my_support_tickets(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro ao buscar chamados: {str(e)}")
 
+# ============================================================
 # 3. ADMIN — LISTAR TODOS
+# ============================================================
 @router.get("/", response_model=List[TicketAdminResponse])
 async def list_all_tickets(
     perfil: str = Depends(obter_perfil_usuario)
@@ -57,7 +63,9 @@ async def list_all_tickets(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Erro ao listar tickets: {str(e)}")
 
+# ============================================================
 # 4. ADMIN — ATUALIZAR TICKET
+# ============================================================
 @router.patch("/{ticket_id}", response_model=TicketResponse)
 async def update_ticket(
     ticket_id: int,

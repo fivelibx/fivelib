@@ -5,6 +5,9 @@ class TicketRepository:
     def __init__(self, client: Client):
         self.client = client
 
+    # ============================================================
+    # CRIAÇÃO DE TICKETS DE SUPORTE
+    # ============================================================
     def create_ticket(self, ticket_data: TicketCreate, usuario_id: int) -> dict:
         db_data = {
             "usuario_id": usuario_id,
@@ -21,6 +24,9 @@ class TicketRepository:
             
         return response.data[0]
     
+    # ============================================================
+    # CONSULTA GLOBAL DE TICKETS — PAINEL ADMIN
+    # ============================================================
     def get_all_tickets(self) -> list[dict]:
         """Retorna todos os tickets do banco (Painel Admin) com o relacionamento do usuário."""
         try:
@@ -36,6 +42,9 @@ class TicketRepository:
             print("🚨" * 20 + "\n")
             raise e
 
+    # ============================================================
+    # ATUALIZAÇÃO DE STATUS E OBSERVAÇÕES — ADMIN
+    # ============================================================
     def update_ticket_status(self, ticket_id: int, update_data: TicketUpdateAdmin) -> dict:
         up_data = {
             "status": update_data.status,
@@ -52,6 +61,9 @@ class TicketRepository:
             
         return response.data[0]
 
+    # ============================================================
+    # CONSULTA DE TICKETS POR USUÁRIO LOGADO
+    # ============================================================
     def get_tickets_by_user(self, usuario_id: int) -> list[dict]:
         """Retorna apenas os tickets vinculados ao usuário logado."""
         try:
