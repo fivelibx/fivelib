@@ -5,6 +5,9 @@ class ToolRepository:
         self.client = client
         self.table = "tool" 
         
+    # ============================================================
+    # CONSULTA DE FERRAMENTAS (LISTAGEM E FILTRO)
+    # ============================================================
     def get_all(self):
         response = self.client.table(self.table).select("*").execute()
         return response.data
@@ -13,14 +16,22 @@ class ToolRepository:
         response = self.client.table(self.table).select("*").eq("id", tool_id).execute()
         return response.data[0] if response.data else None
 
+    # ============================================================
+    # ATUALIZAÇÃO DE INTERAÇÕES (STARS)
+    # ============================================================
     def update_stars(self, tool_id: int, new_stars: int):
         response = self.client.table(self.table).update({"stars": new_stars}).eq("id", tool_id).execute()
         return response.data
+
+    # ============================================================
+    # PERSISTÊNCIA E EXCLUSÃO DE REGISTROS (CUD)
+    # ============================================================
     def create(self, data: dict):
         if "id" in data and (data["id"] is None or data["id"] == 0):
             data.pop("id")
         resultado = self.client.table(self.table).insert(data).execute()
         return resultado.data
+
     def delete(self, tool_id: int):
         resultado = self.client.table(self.table).delete().eq("id", tool_id).execute()
         return resultado.data

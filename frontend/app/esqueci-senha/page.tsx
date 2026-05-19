@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { BookOpen, Mail, Lock, ArrowRight, ArrowLeft, Loader2, CheckCircle2, RefreshCw } from "lucide-react"
+import { BookOpen, Mail, Lock, ArrowRight, ArrowLeft, Loader2, CheckCircle2, RefreshCw, Check, X } from "lucide-react"
 import { forgotPassword, resetPassword } from "../../services/api"
 
 type Step = "SOLICITAR" | "REDEFINIR" | "SUCESSO"
@@ -18,7 +18,6 @@ type Step = "SOLICITAR" | "REDEFINIR" | "SUCESSO"
 const translateBackendError = (msg: string): string => {
   if (!msg) return "Erro desconhecido.";
   
-
   if (msg.includes("String should have at least")) {
     const minChars = msg.match(/\d+/);
     return `A senha deve conter pelo menos ${minChars ? minChars[0] : '8'} caracteres.`;
@@ -42,15 +41,15 @@ export default function EsqueciSenhaPage() {
   const [step, setStep] = useState<Step>("SOLICITAR")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // Estados do fluxo
   const [email, setEmail] = useState("")
   const [code, setCode] = useState("")
   const [novaSenha, setNovaSenha] = useState("")
   const [confirmarSenha, setConfirmarSenha] = useState("")
-
-  // Estados do Reenvio de Código
   const [resendTimer, setResendTimer] = useState(0)
+  const senhaTemTamanhoMinimo = novaSenha.length >= 8
+  const senhaTemMaiuscula = /[A-Z]/.test(novaSenha)
+  const senhaTemMinuscula = /[a-z]/.test(novaSenha)
+  const senhaValidaParaEnvio = novaSenha.length > 0 && senhaTemTamanhoMinimo && senhaTemMaiuscula && senhaTemMinuscula
 
   // Controle do Timer de 60 segundos
   useEffect(() => {
@@ -62,19 +61,18 @@ export default function EsqueciSenhaPage() {
     }
   }, [resendTimer])
 
-  // Lógica de cálculo de força da senha
   const getPasswordStrength = (password: string) => {
     if (!password) return { score: 0, label: "", color: "bg-border" }
     
     let points = 0
     if (password.length >= 8) points += 1
     if (/[A-Z]/.test(password)) points += 1
+    if (/[a-z]/.test(password)) points += 1
     if (/[0-9]/.test(password)) points += 1
-    if (/[^A-Za-z0-9]/.test(password)) points += 1
 
     switch (points) {
       case 1: return { score: 25, label: "Fraca", color: "bg-destructive" }
-      case 2: return { score: 50, label: "Mediana", color: "bg-warning or bg-amber-500" }
+      case 2: return { score: 50, label: "Mediana", color: "bg-amber-500" }
       case 3: return { score: 75, label: "Boa", color: "bg-blue-500" }
       case 4: return { score: 100, label: "Forte", color: "bg-emerald-500" }
       default: return { score: 0, label: "Fraca", color: "bg-destructive" }
@@ -90,7 +88,7 @@ export default function EsqueciSenhaPage() {
 
     try {
       await forgotPassword({ email })
-      setResendTimer(60) // Inicia cooldown de 1 minuto
+      setResendTimer(60)
       if (step !== "REDEFINIR") setStep("REDEFINIR")
     } catch (err: any) {
       if (err.data && Array.isArray(err.data.detail)) {
@@ -108,6 +106,11 @@ export default function EsqueciSenhaPage() {
   const handleRedefinirSenha = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+
+    if (!senhaValidaParaEnvio) {
+      setError("A nova senha escolhida não atende a todos os critérios de segurança mínimos.")
+      return
+    }
 
     if (novaSenha !== confirmarSenha) {
       setError("As senhas não coincidem.")
@@ -183,7 +186,8 @@ export default function EsqueciSenhaPage() {
                           placeholder="seu@email.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="border-border bg-secondary pl-10 text-foreground required"
+                          className="border-border bg-secondary pl-10 text-foreground"
+                          required
                           disabled={isLoading}
                         />
                       </div>
@@ -245,7 +249,7 @@ export default function EsqueciSenhaPage() {
                         <Input
                           id="novaSenha"
                           type="password"
-                          placeholder="Mínimo 8 caracteres"
+                          placeholder="••••••••"
                           value={novaSenha}
                           onChange={(e) => setNovaSenha(e.target.value)}
                           className="border-border bg-secondary pl-10 text-foreground"
@@ -254,18 +258,61 @@ export default function EsqueciSenhaPage() {
                         />
                       </div>
                       
-                      {/* Barra de Progresso de Força da Senha */}
+                      {/* Bloco Completo da Força da Senha e Critérios Obrigatórios em Grade */}
                       {novaSenha && (
-                        <div className="space-y-1 pt-1">
-                          <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
-                            <div 
-                              className={`h-full transition-all duration-300 ${strength.color}`} 
-                              style={{ width: `${strength.score}%` }}
-                            />
+                        <div className="p-2.5 rounded-lg border bg-secondary/20 border-border/50 space-y-2.5 transition-all">
+                          
+                          {/* Barra de Progresso reativa */}
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-[10px] uppercase font-bold text-muted-foreground tracking-wide">
+                              <span>Força da Senha</span>
+                              <span className="font-sans font-extrabold">{strength.label}</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full transition-all duration-300 ${strength.color}`} 
+                                style={{ width: `${strength.score}%` }}
+                              />
+                            </div>
                           </div>
-                          <p className="text-right text-xs text-muted-foreground">
-                            Força: <span className="font-medium text-foreground">{strength.label}</span>
-                          </p>
+
+                          <span className="text-[10px] font-bold text-muted-foreground block uppercase tracking-wider pt-1 border-t border-border/30">Critérios obrigatórios:</span>
+                          
+                          <div className="grid gap-1.5 grid-cols-1 sm:grid-cols-3">
+                            <div className="flex items-center gap-1.5 text-xs">
+                              {senhaTemTamanhoMinimo ? (
+                                <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                              ) : (
+                                <X className="h-3.5 w-3.5 text-destructive shrink-0" />
+                              )}
+                              <span className={senhaTemTamanhoMinimo ? "text-emerald-500 font-medium" : "text-muted-foreground text-[11px]"}>
+                                Pelo menos 8 carac.
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 text-xs">
+                              {senhaTemMaiuscula ? (
+                                <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                              ) : (
+                                <X className="h-3.5 w-3.5 text-destructive shrink-0" />
+                              )}
+                              <span className={senhaTemMaiuscula ? "text-emerald-500 font-medium" : "text-muted-foreground text-[11px]"}>
+                                Letra Maiúscula
+                              </span>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 text-xs">
+                              {senhaTemMinuscula ? (
+                                <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                              ) : (
+                                <X className="h-3.5 w-3.5 text-destructive shrink-0" />
+                              )}
+                              <span className={senhaTemMinuscula ? "text-emerald-500 font-medium" : "text-muted-foreground text-[11px]"}>
+                                Letra Minúscula
+                              </span>
+                            </div>
+                          </div>
+
                         </div>
                       )}
                     </div>
@@ -287,7 +334,11 @@ export default function EsqueciSenhaPage() {
                       </div>
                     </div>
 
-                    <Button type="submit" className="w-full bg-primary text-primary-foreground" disabled={isLoading}>
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-primary text-primary-foreground disabled:opacity-40" 
+                      disabled={isLoading || !senhaValidaParaEnvio}
+                    >
                       {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Alterar Senha e Acessar"}
                     </Button>
 
@@ -314,7 +365,7 @@ export default function EsqueciSenhaPage() {
                 <div className="space-y-2">
                   <h2 className="text-xl font-bold text-foreground">Senha alterada!</h2>
                   <p className="text-sm text-muted-foreground">
-                    Sua credencial de segurança foi atualizada no banco de dados com sucesso.
+                    Sua credencial de segurança foi updated no banco de dados com sucesso.
                   </p>
                 </div>
                 <Button onClick={() => router.push("/login")} className="w-full bg-primary text-primary-foreground mt-2">

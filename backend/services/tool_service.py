@@ -4,6 +4,9 @@ class ToolService:
     def __init__(self, repository: ToolRepository):
         self.repository = repository
 
+    # ============================================================
+    # REGRA DE NEGÓCIO: INCREMENTAR CLASSIFICAÇÃO (STARS)
+    # ============================================================
     def increment_tool_stars(self, tool_id: int):
         tool = self.repository.get_by_id(tool_id)
         if not tool:

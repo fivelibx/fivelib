@@ -113,8 +113,6 @@ export function Header({ isLoggedIn: initialIsLoggedIn = false, userName: initia
                       Ver Perfil
                     </button>
                   </Link>
-
-                  {/* 💡 AJUSTADO: Redirecionamento corrigido para /dashboard */}
                   <Link href="/dashboard" onClick={() => setDropdownOpen(false)}>
                     <button className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
                       <Library className="h-4 w-4 text-muted-foreground" />
@@ -122,7 +120,7 @@ export function Header({ isLoggedIn: initialIsLoggedIn = false, userName: initia
                     </button>
                   </Link>
 
-                  <Link href="/suporte/meus-chamados" onClick={() => setDropdownOpen(false)}>
+                  <Link href="/perfil/chamados" onClick={() => setDropdownOpen(false)}>
                     <button className="flex w-full items-center gap-2 rounded-sm px-3 py-2 text-left text-sm text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors">
                       <HelpCircle className="h-4 w-4 text-muted-foreground" />
                       Meus Chamados

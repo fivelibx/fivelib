@@ -8,6 +8,9 @@ BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 BREVO_FROM_EMAIL = os.getenv("BREVO_FROM_EMAIL", "fivelibx@outlook.com")
 BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
 
+# ============================================================
+# SERVIÇO DE DISPARO DE E-MAIL (INTEGRAÇÃO BREVO API)
+# ============================================================
 async def enviar_email_verificacao(email: str, codigo: str) -> bool:
     """
     Dispara um e-mail assíncrono via API do Brevo contendo o código OTP
@@ -50,6 +53,9 @@ async def enviar_email_verificacao(email: str, codigo: str) -> bool:
         "htmlContent": html_content
     }
 
+    # ============================================================
+    # REQUISIÇÃO ASSÍNCRONA E TRATAMENTO DE RETORNO (HTTPX)
+    # ============================================================
     async with httpx.AsyncClient() as client:
         try:
             response = await client.post(BREVO_API_URL, headers=headers, json=payload)

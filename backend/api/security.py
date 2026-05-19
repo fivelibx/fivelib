@@ -12,6 +12,9 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
+# ============================================================
+# HASHING DE SENHA (BCRYPT)
+# ============================================================
 def obter_hash_senha(senha: str) -> str:
     senha_bytes = senha.encode('utf-8')
     salt = bcrypt.gensalt()
@@ -27,6 +30,9 @@ def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
         return False
 
 
+# ============================================================
+# GERENCIAMENTO DE TOKENS JWT
+# ============================================================
 def criar_token_acesso(data: dict) -> str:
     dados_para_criptografar = data.copy()
 
@@ -52,6 +58,10 @@ def decodificar_token_acesso(token: str) -> dict:
             detail="Token de acesso inválido.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+# ============================================================
+# DEPENDÊNCIAS DE AUTENTICAÇÃO E EXTRAÇÃO DE PAYLOAD
+# ============================================================
 async def obter_usuario_logado(token: str = Depends(oauth2_scheme)) -> dict:
     return decodificar_token_acesso(token)
 
@@ -73,6 +83,9 @@ async def obter_perfil_usuario(token_data: dict = Depends(obter_usuario_logado))
             detail="Falha na autenticação ou sessão inválida."
         )
 
+# ============================================================
+# CONTROLE DE ACESSO — DEPENDÊNCIAS DE AUTORIZAÇÃO (RBAC)
+# ============================================================
 async def verificar_moderador(
     token_data: dict = Depends(obter_usuario_logado),
     perfil: str = Depends(obter_perfil_usuario)
