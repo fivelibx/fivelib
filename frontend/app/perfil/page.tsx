@@ -38,9 +38,9 @@ export default function PerfilPage() {
     nome: "",
     email: "",
     senha: "",
-    titulo_professional: "Desenvolvedor Backend | Python & FastAPI",
-    github: "lucaspaiva-lp",
-    linkedin: "lucas-paiva"
+    titulo_professional: "",
+    github: "",
+    linkedin: ""
   })
 
   // Regras de validação expandidas para a senha
@@ -378,7 +378,7 @@ export default function PerfilPage() {
                             <label className="text-xs font-medium text-muted-foreground block">Usuário do GitHub</label>
                             <div className="relative flex items-center">
                               <Github className="absolute left-3 h-4 w-4 text-muted-foreground" />
-                              <input type="text" value={formData.github} onChange={(e) => setFormData({ ...formData, github: e.target.value })} className="w-full p-2.5 pl-9 rounded-lg bg-background border border-border text-sm text-foreground focus:outline-none focus:border-primary" disabled={salvandoDados} />
+                              <input type="text" value={formData.github} onChange={(e) => setFormData({ ...formData, github: e.target.value })} placeholder="Ex: lucaspaiva-lp" className="w-full p-2.5 pl-9 rounded-lg bg-background border border-border text-sm text-foreground focus:outline-none focus:border-primary" disabled={salvandoDados} />
                             </div>
                           </div>
 
@@ -386,7 +386,7 @@ export default function PerfilPage() {
                             <label className="text-xs font-medium text-muted-foreground block">ID do LinkedIn (Slug da URL)</label>
                             <div className="relative flex items-center">
                               <Linkedin className="absolute left-3 h-4 w-4 text-muted-foreground" />
-                              <input type="text" value={formData.linkedin} onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })} className="w-full p-2.5 pl-9 rounded-lg bg-background border border-border text-sm text-foreground focus:outline-none focus:border-primary" disabled={salvandoDados} />
+                              <input type="text" value={formData.linkedin} onChange={(e) => setFormData({ ...formData, linkedin: e.target.value })} placeholder="Ex: lucaspaiva-lp" className="w-full p-2.5 pl-9 rounded-lg bg-background border border-border text-sm text-foreground focus:outline-none focus:border-primary" disabled={salvandoDados} />
                             </div>
                           </div>
                         </div>
