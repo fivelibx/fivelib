@@ -50,12 +50,21 @@ export default function LoginPage() {
       const data = await login({ email, password })
 
       if (data.role === "admin") {
-        router.push("/admin")
+        router.push("/")
       } else {
-        router.push("/dashboard")
+        router.push("/")
       }
     } catch (err: any) {
-      setError(err.message || "Credenciais inválidas")
+      const errStatus = err.status;
+      const errData = err.data;
+      const detail = errData?.detail;
+
+      if (errStatus === 403 && detail && typeof detail === "object" && detail.error === "requires_verification") {
+        router.push(`/verificar-conta?email=${encodeURIComponent(detail.email)}`);
+        return;
+      }
+
+      setError(err.message || "Credenciais inválidas");
     } finally {
       setIsLoading(false)
     }
@@ -125,7 +134,7 @@ export default function LoginPage() {
                       Senha
                     </Label>
                     <Link
-                      href="#"
+                      href="/esqueci-senha"
                       className="text-sm text-primary hover:underline"
                     >
                       Esqueceu a senha?
@@ -169,7 +178,7 @@ export default function LoginPage() {
                   )}
                 </Button>
               </form>
-
+                {/*
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border" />
@@ -180,7 +189,7 @@ export default function LoginPage() {
                   </span>
                 </div>
               </div>
-
+                
               <Button
                 variant="outline"
                 className="w-full gap-2 border-border text-foreground hover:border-primary hover:text-primary"
@@ -189,7 +198,7 @@ export default function LoginPage() {
                 <Github className="h-4 w-4" />
                 GitHub
               </Button>
-
+                */}
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 Não tem uma conta?{" "}
                 <Link href="/cadastro" className="font-medium text-primary hover:underline">

@@ -8,10 +8,10 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
-import { BookOpen, Mail, Lock, User, ArrowRight, Github, Calendar, Loader2 } from "lucide-react"
+import { BookOpen, Mail, Lock, User, ArrowRight, Github, Calendar, Loader2, Check, X } from "lucide-react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { register } from "../../services/api"
+import { register, RegisterData } from "../../services/api"
 
 export default function CadastroPage() {
   const router = useRouter()
@@ -25,11 +25,48 @@ export default function CadastroPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Regras de validação idênticas ao perfil
+  const senhaTemTamanhoMinimo = password.length >= 8
+  const senhaTemMaiuscula = /[A-Z]/.test(password)
+  const senhaTemMinuscula = /[a-z]/.test(password)
+
+  // Validação estrita para habilitar o envio
+  const senhaValidaParaEnvio = password.length > 0 && senhaTemTamanhoMinimo && senhaTemMaiuscula && senhaTemMinuscula
+
+  const getPasswordStrength = (password: string) => {
+    if (!password) return { score: 0, label: "", color: "bg-border" }
+    
+    let points = 0
+    if (password.length >= 8) points += 1
+    if (/[A-Z]/.test(password)) points += 1
+    if (/[a-z]/.test(password)) points += 1
+    if (/[0-9]/.test(password)) points += 1
+
+    switch (points) {
+      case 1: return { score: 25, label: "Fraca", color: "bg-destructive" }
+      case 2: return { score: 50, label: "Mediana", color: "bg-amber-500" }
+      case 3: return { score: 75, label: "Boa", color: "bg-blue-500" }
+      case 4: return { score: 100, label: "Forte", color: "bg-emerald-500" }
+      default: return { score: 0, label: "Fraca", color: "bg-destructive" }
+    }
+  }
+
+  const strength = getPasswordStrength(password)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
-    // Validação de senhas coincidentes no frontend
+    if (!acceptTerms) {
+      setError("Você precisa aceitar os Termos de Uso e a Política de Privacidade.")
+      return
+    }
+
+    if (!senhaValidaParaEnvio) {
+      setError("A senha escolhida não atende a todos os critérios de segurança mínimos.")
+      return
+    }
+
     if (password !== confirmPassword) {
       setError("As senhas não coincidem.")
       return
@@ -41,12 +78,12 @@ export default function CadastroPage() {
       await register({
         nome: name,
         email: email,
-        senha: password, // Envia como 'senha' para mapear com o backend
-        data_nascimento: birthDate, // Envia como 'data_nascimento'
-      })
+        senha: password,
+        data_nascimento: birthDate,
+        accepted_terms: acceptTerms,
+      } as RegisterData)
 
-      // Redireciona para o login informando sucesso via query param
-      router.push("/login?registered=true")
+      router.push(`/verificar-conta?email=${encodeURIComponent(email)}`)
     } catch (err: any) {
       setError(err.message || "Erro ao conectar com o servidor.")
     } finally {
@@ -145,7 +182,7 @@ export default function CadastroPage() {
                     />
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Menores de 18 anos possuem restrições na abertura de chamados.
+                    Não é permitido cadastro de menores de 13 anos.
                   </p>
                 </div>
 
@@ -167,6 +204,64 @@ export default function CadastroPage() {
                     />
                   </div>
                 </div>
+
+                {/* Bloco Unificado da força da senha e critérios visuais do Perfil */}
+                {password && (
+                  <div className="p-2.5 rounded-lg border bg-secondary/20 border-border/50 space-y-2.5 transition-all">
+                    
+                    {/* Barra de Progresso reativa */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[10px] uppercase font-bold text-muted-foreground tracking-wide">
+                        <span>Força da Senha</span>
+                        <span className="font-sans font-extrabold">{strength.label}</span>
+                      </div>
+                      <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden">
+                        <div 
+                          className={`h-full transition-all duration-300 ${strength.color}`} 
+                          style={{ width: `${strength.score}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    <span className="text-[10px] font-bold text-muted-foreground block uppercase tracking-wider pt-1 border-t border-border/30">Critérios obrigatórios:</span>
+                    
+                    <div className="grid gap-1.5 grid-cols-1 sm:grid-cols-3">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        {senhaTemTamanhoMinimo ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                        ) : (
+                          <X className="h-3.5 w-3.5 text-destructive shrink-0" />
+                        )}
+                        <span className={senhaTemTamanhoMinimo ? "text-emerald-500 font-medium" : "text-muted-foreground text-[11px]"}>
+                          Pelo menos 8 carac.
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-xs">
+                        {senhaTemMaiuscula ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                        ) : (
+                          <X className="h-3.5 w-3.5 text-destructive shrink-0" />
+                        )}
+                        <span className={senhaTemMaiuscula ? "text-emerald-500 font-medium" : "text-muted-foreground text-[11px]"}>
+                          Letra Maiúscula
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-xs">
+                        {senhaTemMinuscula ? (
+                          <Check className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                        ) : (
+                          <X className="h-3.5 w-3.5 text-destructive shrink-0" />
+                        )}
+                        <span className={senhaTemMinuscula ? "text-emerald-500 font-medium" : "text-muted-foreground text-[11px]"}>
+                          Letra Minúscula
+                        </span>
+                      </div>
+                    </div>
+
+                  </div>
+                )}
 
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="text-foreground">
@@ -197,23 +292,23 @@ export default function CadastroPage() {
                   />
                   <Label
                     htmlFor="terms"
-                    className="text-sm leading-relaxed text-muted-foreground"
+                    className="text-sm leading-relaxed text-muted-foreground cursor-pointer select-none"
                   >
                     Eu concordo com os{" "}
-                    <Link href="#" className="text-primary hover:underline">
+                    <Link href="/termos" className="text-primary hover:underline" target="_blank">
                       Termos de Uso
                     </Link>{" "}
                     e{" "}
-                    <Link href="#" className="text-primary hover:underline">
+                    <Link href="/privacidade" className="text-primary hover:underline" target="_blank">
                       Política de Privacidade
-                    </Link>
+                    </Link>.
                   </Label>
                 </div>
 
                 <Button
                   type="submit"
-                  className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
-                  disabled={!acceptTerms || isLoading}
+                  className="w-full gap-2 bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-40"
+                  disabled={!acceptTerms || !senhaValidaParaEnvio || isLoading}
                 >
                   {isLoading ? (
                     <>
@@ -228,7 +323,7 @@ export default function CadastroPage() {
                   )}
                 </Button>
               </form>
-
+              {/*
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border" />
@@ -239,7 +334,6 @@ export default function CadastroPage() {
                   </span>
                 </div>
               </div>
-
               <Button
                 variant="outline"
                 className="w-full gap-2 border-border text-foreground hover:border-primary hover:text-primary"
@@ -248,7 +342,7 @@ export default function CadastroPage() {
                 <Github className="h-4 w-4" />
                 GitHub
               </Button>
-
+              */}
               <p className="mt-6 text-center text-sm text-muted-foreground">
                 Já tem uma conta?{" "}
                 <Link href="/login" className="font-medium text-primary hover:underline">

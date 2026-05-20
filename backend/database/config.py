@@ -1,6 +1,9 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from supabase import create_client, Client
 
+# ============================================================
+# CONFIGURAÇÃO DAS VARIÁVEIS DE AMBIENTE (PYDANTIC)
+# ============================================================
 class Settings(BaseSettings):
     SUPABASE_URL: str = ""
     SUPABASE_KEY: str = ""
@@ -13,4 +16,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
+# ============================================================
+# INICIALIZAÇÃO DO CLIENTE GLOBAL DO SUPABASE
+# ============================================================
 supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)

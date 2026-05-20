@@ -3,6 +3,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from .base import Base
 
+# ============================================================
+# ENTIDADE: FAVORITE (TABELA INTERMEDIÁRIA N:N)
+# ============================================================
 class Favorite(Base):
     """
     Entidade: Favoritos (Relacionamento N:N)
@@ -31,6 +34,9 @@ class Favorite(Base):
         Index("favorite_ferramenta_id_idx", "ferramenta_id"),
     )
 
+# ============================================================
+# ENTIDADE: TOOL (FERRAMENTAS CADASTRADAS)
+# ============================================================
 class Tool(Base):
     __tablename__ = "tool"
 
@@ -41,6 +47,9 @@ class Tool(Base):
     linguagem: Mapped[str] = mapped_column(String(255), nullable=False)
     status_ativo: Mapped[bool] = mapped_column(Boolean, server_default="true")
 
+# ============================================================
+# ENTIDADE: USER (USUÁRIOS DO SISTEMA)
+# ============================================================
 class User(Base):
     __tablename__ = "user"
 
@@ -59,6 +68,9 @@ class User(Base):
     links_privados: Mapped[list["PrivateLink"]] = relationship(back_populates="usuario")
     tickets: Mapped[list["SupportTicket"]] = relationship(back_populates="usuario")
 
+# ============================================================
+# ENTIDADE: PRIVATE LINK (LINKS EXCLUSIVOS DO USUÁRIO)
+# ============================================================
 class PrivateLink(Base):
     __tablename__ = "private_link"
 
@@ -77,6 +89,9 @@ class PrivateLink(Base):
         Index("private_link_usuario_id_idx", "usuario_id"),
     )
 
+# ============================================================
+# ENTIDADE: SUPPORT TICKET (CHAMADOS DE SUPORTE)
+# ============================================================
 class SupportTicket(Base):
     __tablename__ = "support_ticket"
 
