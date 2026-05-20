@@ -86,7 +86,6 @@ export function ToolCard({ tool, initialFavorite = false }: { tool: Tool, initia
 
   const [isFavorite, setIsFavorite] = useState(initialFavorite)
   const [stars, setStars] = useState(tool.stars)
-
   const [hasStarred, setHasStarred] = useState(() => {
     if (typeof window !== "undefined") {
       const localStars = JSON.parse(localStorage.getItem("fivelib_stars") || "{}")
@@ -94,17 +93,6 @@ export function ToolCard({ tool, initialFavorite = false }: { tool: Tool, initia
     }
     return false
   })
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const localStars = JSON.parse(localStorage.getItem("fivelib_stars") || "{}")
-      if (localStars[tool.id]) {
-        setStars(tool.stars)
-        return
-      }
-    }
-    setStars(tool.stars)
-  }, [tool.stars, tool.id])
 
   useEffect(() => {
     setIsFavorite(initialFavorite)
@@ -119,39 +107,30 @@ export function ToolCard({ tool, initialFavorite = false }: { tool: Tool, initia
       return
     }
 
-    if (!hasStarred) {
-      setStars(prev => prev + 1)
-      setHasStarred(true)
+    const nextHasStarred = !hasStarred
+    const previousStars = stars
+
+    setStars(prev => nextHasStarred ? prev + 1 : Math.max(0, prev - 1))
+    setHasStarred(nextHasStarred)
+
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
       
-      if (typeof window !== "undefined") {
-        const localStars = JSON.parse(localStorage.getItem("fivelib_stars") || "{}")
+      await fetch(`${baseUrl}/resources/${tool.id}/star`, {
+        method: nextHasStarred ? "PATCH" : "DELETE",
+        headers: { "Content-Type": "application/json" }
+      })
+
+      const localStars = JSON.parse(localStorage.getItem("fivelib_stars") || "{}")
+      if (nextHasStarred) {
         localStars[tool.id] = true
-        localStorage.setItem("fivelib_stars", JSON.stringify(localStars))
+      } else {
+        delete localStars[tool.id]
       }
-      
-      try {
-        const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
-
-        const res = await fetch(`${baseUrl}/resources/${tool.id}/star`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-          }
-        })
-
-        if (!res.ok) throw new Error("Erro ao persistir voto")
-          
-      } catch (error) {
-        setStars(prev => prev - 1)
-        setHasStarred(false)
-        if (typeof window !== "undefined") {
-          const localStars = JSON.parse(localStorage.getItem("fivelib_stars") || "{}")
-          delete localStars[tool.id]
-          localStorage.setItem("fivelib_stars", JSON.stringify(localStars))
-        }
-      }
+      localStorage.setItem("fivelib_stars", JSON.stringify(localStars))
+    } catch (error) {
+      setStars(previousStars)
+      setHasStarred(!nextHasStarred)
     }
   }
 
@@ -171,24 +150,14 @@ export function ToolCard({ tool, initialFavorite = false }: { tool: Tool, initia
       const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
 
-      if (next) {
-        await fetch(`${baseUrl}/usuarios/me/favorites`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify({ ferramenta_id: tool.id })
-        })
-      } else {
-        await fetch(`${baseUrl}/usuarios/me/favorites/${tool.id}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { "Authorization": `Bearer ${token}` } : {}),
-          }
-        })
-      }
+      await fetch(`${baseUrl}/usuarios/me/favorites${next ? "" : `/${tool.id}`}`, {
+        method: next ? "POST" : "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+        },
+        body: next ? JSON.stringify({ ferramenta_id: tool.id }) : null
+      })
     } catch (error) {
       setIsFavorite(!next)
     }
@@ -248,7 +217,6 @@ export function ToolCard({ tool, initialFavorite = false }: { tool: Tool, initia
             onClick={handleToggleStar}
             className="flex items-center gap-1.5 text-primary cursor-pointer transition-transform active:scale-95"
           >
-            {/* ClassName ajustado para pintar a estrela de amarelo text-primary quando tiver star ativo */}
             <Star 
               size={14} 
               className={cn(
