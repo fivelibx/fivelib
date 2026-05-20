@@ -39,21 +39,18 @@ export default function HomePage() {
   const { isLoggedIn } = useAuth()
   
   const [popularTools, setPopularTools] = useState<Tool[]>([])
-  const [favoritesIds, setFavoritesIds] = useState<number[]>([]) // 🛠️ Corrigido: Inicializador correto sem "=" dentro do tipo
+  const [favoritesIds, setFavoritesIds] = useState<number[]>([])
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     async function loadHomeContent() {
       try {
-        // 1. Busca todos os recursos
         const data = await getResources()
         
-        // Ordena por estrelas e pega os 6 principais
         const sorted = [...data].sort((a, b) => (b.stars || 0) - (a.stars || 0)).slice(0, 6)
         setPopularTools(sorted)
 
-        // 2. Agrupa a contagem exata vinda das categorias do backend
         const counts: Record<string, number> = {}
         data.forEach((tool) => {
           if (tool.categoria) {
@@ -63,10 +60,9 @@ export default function HomePage() {
         })
         setCategoryCounts(counts)
 
-        // 3. Sincroniza os IDs usando seu método nativo que já retorna a array pronta
         if (isLoggedIn) {
           const ids = await getMyFavoriteIds()
-          setFavoritesIds(ids) // 🛠️ Corrigido: Evita o erro de .map() em tipo inadequado
+          setFavoritesIds(ids)
         }
       } catch (error) {
         console.error("Erro na carga dinâmica da Home:", error)
