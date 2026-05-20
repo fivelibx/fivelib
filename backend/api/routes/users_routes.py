@@ -197,3 +197,41 @@ async def atualizar_proprio_perfil(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Erro ao atualizar o perfil: {str(e)}"
         )
+        
+# ============================================================
+# ROTAS DE FAVORITOS (Mescladas da branch de Favoritos)
+# ============================================================
+
+@router.get("/me/favorites")
+async def list_my_favorites(usuario_atual: dict = Depends(obter_usuario_atual)):
+    from repositories.favorite_repository import FavoriteRepository
+    repo = FavoriteRepository(supabase)
+    ids = repo.list_ids_by_user(usuario_atual["id"])
+    return {"ferramenta_ids": ids}
+
+@router.post("/me/favorites", status_code=201)
+async def add_favorite_endpoint(body: dict, usuario_atual: dict = Depends(obter_usuario_atual)):
+    from repositories.tool_repository import ToolRepository
+    from repositories.favorite_repository import FavoriteRepository
+    
+    ferramenta_id = body.get("ferramenta_id")
+    if not ferramenta_id:
+        raise HTTPException(status_code=400, detail="ID da ferramenta é obrigatório.")
+
+    tool_repo = ToolRepository(supabase)
+    if not tool_repo.get_by_id(ferramenta_id):
+        raise HTTPException(status_code=404, detail="Ferramenta não encontrada")
+
+    fav_repo = FavoriteRepository(supabase)
+    if fav_repo.exists(usuario_atual["id"], ferramenta_id):
+        return {"mensagem": "Já favoritado"}
+    
+    fav_repo.add(usuario_atual["id"], ferramenta_id)
+    return {"mensagem": "Favorito adicionado"}
+
+@router.delete("/me/favorites/{ferramenta_id}", status_code=204)
+async def remove_favorite_endpoint(ferramenta_id: int, usuario_atual: dict = Depends(obter_usuario_atual)):
+    from repositories.favorite_repository import FavoriteRepository
+    fav_repo = FavoriteRepository(supabase)
+    if not fav_repo.remove(usuario_atual["id"], ferramenta_id):
+        raise HTTPException(status_code=404, detail="Favorito não encontrado")
