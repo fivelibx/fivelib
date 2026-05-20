@@ -559,6 +559,34 @@ export async function atualizarPerfilUsuario(userId: string, data: UserPerfilUpd
   return response.json();
 }
 
+
+// ============================================================
+// BUSCAR (STARS)
+// ============================================================
+
+export async function getMyFavoriteIds(): Promise<number[]> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+  
+  if (!token) return [];
+
+  try {
+    const response = await fetch(`${baseUrl}/usuarios/me/favorites`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.ferramenta_ids || []; 
+  } catch {
+    return [];
+  }
+}
+
 // ============================================================
 // MISCELÂNEA
 // ============================================================

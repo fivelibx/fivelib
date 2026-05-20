@@ -5,17 +5,20 @@ class FavoriteRepository:
         self.client = client
         self.table = "favorite"
 
-    def list_ids_by_user(self, usuario_id:int)->list[int]:
+    # ============================================================
+    # CONSULTA E VALIDAÇÃO DE FAVORITOS POR USUÁRIO
+    # ============================================================
+    def list_ids_by_user(self, usuario_id: str) -> list[int]:
         res = (
             self.client.table(self.table)
-            .select("ferramentaa_id")
+            .select("ferramenta_id") 
             .eq("usuario_id", usuario_id)
             .execute()
         )
         return [row["ferramenta_id"] for row in (res.data or [])]
     
-    def exists(self, usuario_id:int, ferramenta_id:int)->bool:
-        res=(
+    def exists(self, usuario_id: str, ferramenta_id: int) -> bool:
+        res = (
             self.client.table(self.table)
             .select("ferramenta_id")
             .eq("usuario_id", usuario_id)
@@ -24,13 +27,16 @@ class FavoriteRepository:
         )
         return bool(res.data)
     
-    def add(self, usuario_id:int, ferramenta_id:int)->None:
+    # ============================================================
+    # PERSISTÊNCIA E EXCLUSÃO DE VÍNCULOS (CRA)
+    # ============================================================
+    def add(self, usuario_id: str, ferramenta_id: int) -> None:
         self.client.table(self.table).insert({
-            "usuario_id":usuario_id,
-            "ferramenta_id":ferramenta_id,
+            "usuario_id": usuario_id,
+            "ferramenta_id": ferramenta_id,
         }).execute()
 
-    def remove(self, usuario_id:int, ferramenta_id:int)->bool:
+    def remove(self, usuario_id: str, ferramenta_id: int) -> bool:
         res = (
             self.client.table(self.table)
             .delete()
@@ -38,7 +44,4 @@ class FavoriteRepository:
             .eq("ferramenta_id", ferramenta_id)
             .execute()
         )
-
         return bool(res.data)
-
-
