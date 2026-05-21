@@ -1,15 +1,24 @@
-"use client" //
+"use client"
 
 import * as React from 'react'
-
+import { Star, Heart, ExternalLink, BookOpen } from 'lucide-react'
+import Link from "next/link"
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import { Tool } from "@/services/api"
+import { useAuth } from '@/hooks/use-auth'
 
-function Card({ className, ...props }: React.ComponentProps<'div'>) {
+// ==========================================
+// COMPONENTES ESTRUTURAIS DO CARD (UI Pura)
+// ==========================================
+
+export function Card({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card"
       className={cn(
-        'bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm',
+        'border border-border bg-card rounded-lg flex flex-col justify-between transition-all hover:border-primary/50 hover:ring-1 hover:ring-primary/50',
         className,
       )}
       {...props}
@@ -17,30 +26,27 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
+export function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card-header"
-      className={cn(
-        '@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6',
-        className,
-      )}
+      className={cn('flex flex-col space-y-1.5 p-6', className)}
       {...props}
     />
   )
 }
 
-function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
+export function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card-title"
-      className={cn('leading-none font-semibold', className)}
+      className={cn('leading-none font-semibold tracking-tight text-foreground', className)}
       {...props}
     />
   )
 }
 
-function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
+export function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card-description"
@@ -50,169 +56,191 @@ function CardDescription({ className, ...props }: React.ComponentProps<'div'>) {
   )
 }
 
-function CardAction({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot="card-action"
-      className={cn(
-        'col-start-2 row-span-2 row-start-1 self-start justify-self-end',
-        className,
-      )}
-      {...props}
-    />
-  )
-}
-
-function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
+export function CardContent({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card-content"
-      className={cn('px-6', className)}
+      className={cn('p-6 pt-0', className)}
       {...props}
     />
   )
 }
 
-function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
+export function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card-footer"
-      className={cn('flex items-center px-6 [.border-t]:pt-6', className)}
+      className={cn('flex items-center p-6 pt-0', className)}
       {...props}
     />
   )
 }
-import { Star, Heart, ExternalLink, BookOpen } from 'lucide-react'
-import Link from "next/link"
-import { api, Tool } from "@/services/api"
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 
-function ToolCard({ tool }: { tool: Tool }) {
+// ==========================================
+// COMPONENTE DE REGRA DE NEGÓCIO (ToolCard)
+// ==========================================
+
+export function ToolCard({ tool, initialFavorite = false }: { tool: Tool, initialFavorite?: boolean }) {
   const router = useRouter()
-  const user = null 
+  const { isLoggedIn } = useAuth()
 
-  const [isFavorite, setIsFavorite] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(initialFavorite)
   const [stars, setStars] = useState(tool.stars)
-  const [hasStarred, setHasStarred] = useState(false)
+  const [hasStarred, setHasStarred] = useState(() => {
+    if (typeof window !== "undefined") {
+      const localStars = JSON.parse(localStorage.getItem("fivelib_stars") || "{}")
+      return !!localStars[tool.id]
+    }
+    return false
+  })
 
-  // -- estrela --
+  useEffect(() => {
+    setIsFavorite(initialFavorite)
+  }, [initialFavorite])
+
   const handleToggleStar = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!user) {
+    if (!isLoggedIn) {
       router.push('/login')
       return
     }
 
-    if (!hasStarred) {
-      setStars(prev => prev + 1)
-      setHasStarred(true)
-      try {
-        await api.incrementStar(tool.id)
-      } catch (error) {
-        setStars(prev => prev - 1)
-        setHasStarred(false)
+    const nextHasStarred = !hasStarred
+    const previousStars = stars
+
+    setStars(prev => nextHasStarred ? prev + 1 : Math.max(0, prev - 1))
+    setHasStarred(nextHasStarred)
+
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+      
+      await fetch(`${baseUrl}/resources/${tool.id}/star`, {
+        method: nextHasStarred ? "PATCH" : "DELETE",
+        headers: { "Content-Type": "application/json" }
+      })
+
+      const localStars = JSON.parse(localStorage.getItem("fivelib_stars") || "{}")
+      if (nextHasStarred) {
+        localStars[tool.id] = true
+      } else {
+        delete localStars[tool.id]
       }
-    } else {
-      setStars(prev => prev - 1)
-      setHasStarred(false)
+      localStorage.setItem("fivelib_stars", JSON.stringify(localStars))
+    } catch (error) {
+      setStars(previousStars)
+      setHasStarred(!nextHasStarred)
     }
   }
 
-  // -- favorito --
-  const handleToggleFavorite = (e: React.MouseEvent) => {
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    if (!user) {
+    if (!isLoggedIn) {
       router.push('/login')
       return
     }
-    setIsFavorite(!isFavorite)
+    
+    const next = !isFavorite
+    setIsFavorite(next)
+
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+
+      await fetch(`${baseUrl}/usuarios/me/favorites${next ? "" : `/${tool.id}`}`, {
+        method: next ? "POST" : "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+        },
+        body: next ? JSON.stringify({ ferramenta_id: tool.id }) : null
+      })
+    } catch (error) {
+      setIsFavorite(!next)
+    }
   }
 
   return (
-    <Card className="group relative border-border bg-card transition-all hover:border-primary/50 hover:ring-1 hover:ring-primary/50">
-      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-            <BookOpen className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-              {tool.nome}
-            </h3>
-            <p className="text-xs text-muted-foreground">{tool.linguagem}</p>
-          </div>
-        </div>
-        <CardAction>
-          <button 
-            onClick={handleToggleFavorite}
-            className={cn(
-              "p-2 rounded-lg transition-all",
-              "hover:bg-primary hover:text-black" // fundo verde e ícone preto no hover
-            )}
-          >
-            <Heart 
-              size={20} 
+    <Card>
+      <div className="p-5 flex flex-col h-full justify-between space-y-4">
+        <div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                <BookOpen className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground tracking-tight group-hover:text-primary transition-colors">
+                  {tool.nome}
+                </h3>
+                <p className="text-xs text-primary font-medium mt-0.5">{tool.linguagem}</p>
+              </div>
+            </div>
+
+            <button 
+              onClick={handleToggleFavorite}
               className={cn(
-                "transition-all",
-                isFavorite ? "fill-[#ff4b4b] text-[#ff4b4b] scale-110" : "text-muted-foreground"
+                "h-8 w-8 inline-flex items-center justify-center rounded-md transition-colors text-muted-foreground hover:bg-secondary/50",
+                isFavorite && "text-destructive"
+              )}
+            >
+              <Heart 
+                size={18} 
+                className={cn(
+                  "transition-all",
+                  isFavorite ? "fill-[#ff4b4b] text-[#ff4b4b] scale-110" : "text-muted-foreground"
+                )} 
+              />
+            </button>
+          </div>
+
+          <p className="text-xs text-muted-foreground mt-3 line-clamp-2 leading-relaxed">
+            {tool.descricao}
+          </p>
+          
+          {tool.tags && tool.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {tool.tags.map((tag) => (
+                <span key={tag} className="rounded-md bg-[#2a2a2a] px-2 py-0.5 text-[10px] text-muted-foreground border border-white/5">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between pt-3 border-t border-border/60">
+          <div 
+            onClick={handleToggleStar}
+            className="flex items-center gap-1.5 text-primary cursor-pointer transition-transform active:scale-95"
+          >
+            <Star 
+              size={14} 
+              className={cn(
+                "transition-all", 
+                hasStarred ? "fill-primary text-primary" : "fill-none text-muted-foreground"
               )} 
             />
-          </button>
-        </CardAction>
-      </CardHeader>
-
-      <CardContent className="pt-4">
-        <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">
-          {tool.descricao}
-        </p>
-        
-        <div className="flex flex-wrap gap-2">
-          {tool.tags?.map((tag) => (
-            <span key={tag} className="rounded-md bg-[#2a2a2a] px-2 py-1 text-[10px] text-muted-foreground border border-white/5">
-              {tag}
+            <span className="text-xs font-medium text-muted-foreground">
+              {stars >= 1000 ? `${(stars / 1000).toFixed(1)}k` : stars}
             </span>
-          ))}
-        </div>
-      </CardContent>
+          </div>
 
-      <CardFooter className="flex items-center justify-between pt-2">
-        <div 
-          onClick={handleToggleStar}
-          className="flex items-center gap-1.5 text-primary cursor-pointer transition-transform active:scale-95"
-        >
-          <Star size={16} className={cn(hasStarred ? "fill-primary" : "fill-none")} />
-          <span className="text-xs font-medium text-muted-foreground">
-            {stars >= 1000 ? `${(stars / 1000).toFixed(1)}k` : stars}
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full font-medium uppercase">
+              {tool.categoria || "Global"}
+            </span>
+            <Link href={tool.url_oficial} target="_blank" rel="noopener noreferrer">
+              <div className="flex items-center gap-1 text-xs text-primary font-medium hover:underline cursor-pointer">
+                Docs <ExternalLink size={12} />
+              </div>
+            </Link>
+          </div>
         </div>
-
-        <div className="flex items-center gap-3">
-          <span className="rounded-md border border-border bg-secondary/30 px-2 py-0.5 text-[10px] text-muted-foreground uppercase">
-            {tool.categoria}
-          </span>
-          <Link href={tool.url_oficial} target="_blank" rel="noopener noreferrer">
-            <div className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors text-xs font-medium cursor-pointer">
-              Docs <ExternalLink size={12} />
-            </div>
-          </Link>
-        </div>
-      </CardFooter>
+      </div>
     </Card>
   )
-}
-
-export {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardTitle,
-  CardAction,
-  CardDescription,
-  CardContent,
-  ToolCard,
 }

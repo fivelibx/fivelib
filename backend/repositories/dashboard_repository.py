@@ -74,7 +74,11 @@ class DashboardRepository:
             .execute()
 
     # ============================================================
-    # REMOÇÃO DE FAVORITOS
+    # REMOÇÃO DE FAVORITOS (USANDO O ID DA FERRAMENTA)
     # ============================================================
-    def remove_favorite(self, user_id: str, tool_id: int) -> None:
-        self.client.table("favorite").delete().eq("user_id", user_id).eq("tool_id", tool_id).execute()
+    def remove_favorite(self, user_id: int, tool_id: int) -> None:
+        self.client.table("favorite") \
+            .delete() \
+            .eq("usuario_id", int(user_id)) \
+            .eq("tool_id", tool_id) \
+            .execute()

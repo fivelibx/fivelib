@@ -88,8 +88,28 @@ Para contribuir ou manter o código, as seguintes diretrizes arquiteturais e de 
 * **API-Driven:** Todas as funcionalidades devem ser idealizadas, modeladas e expostas via endpoints antes de qualquer implementação no Frontend.
 * **Versionamento Semântico:** Uso mandatório do padrão *Conventional Commits* (`feat/`, `fix/`, `docs/`, `chore/`) para integridade do histórico do Git.
 
-## Contribuições e Autores
+## Equipe e Governança
 
-O FiveLib é um projeto aberto a melhorias. Valorizamos contribuições que respeitem a arquitetura e os padrões estabelecidos.
+A governança, arquitetura e desenvolvimento contínuo do FiveLib são liderados por **Lucas Paiva S. de Oliveira**. O projeto adota uma cultura de "Documentation First" e revisões assíncronas para garantir a integridade técnica.
 
-Para entender as regras de desenvolvimento, fluxo de trabalho e como enviar suas alterações, leia nosso [Guia de Contribuição](/.github/CONTRIBUTING.md).
+| Nome | Cargo / Título | Foco de Contribuição |
+| :--- | :--- | :--- |
+| [**Lucas Paiva**](https://github.com/lucaspaiva-lp) | Lead Full Stack Developer & Architect | Arquitetura, Backend, Frontend, Infraestrutura |
+| [**Felipe Gonçalves**](https://github.com/FIGFelip) | Contributor | Autenticação, lógica de interações (Stars/Favorites) |
+
+*Nota: As contribuições técnicas são integradas mediante conformidade com o nosso fluxo de trabalho.*
+
+## Agradecimentos e Concepção
+
+O FiveLib teve sua fase inicial de modelagem de sistemas (PRD e ERD) desenvolvida em colaboração acadêmica com:
+
+* Mateus Alves
+* Nicolas R. Santos
+* Rodrigo Moraes
+* Raian Luz
+
+Agradecemos pela colaboração intelectual e pelo apoio nas etapas de planejamento e definição das regras de negócio do sistema.
+
+## Diretrizes de Contribuição
+
+O FiveLib é um projeto aberto a melhorias. Valorizamos contribuições que respeitem a arquitetura e os padrões estabelecidos. Para entender as regras de desenvolvimento, fluxo de trabalho e como enviar suas alterações, leia nosso [Guia de Contribuição](/.github/CONTRIBUTING.md).

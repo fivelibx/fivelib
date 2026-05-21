@@ -1,3 +1,4 @@
+//import { AuthResponse } from './api';
 const DEFAULT_API_URL = 'http://localhost:8001/api/v1';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_URL;
 
@@ -351,22 +352,27 @@ export async function deletarLinkPrivado(linkId: number): Promise<void> {
   }
 }
 
-export async function removerFerramentaFavorita(toolId: number): Promise<void> {
+export const removerFerramentaFavorita = async (toolId: number) => {
   const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
-  const response = await fetch(`${API_URL}/dashboard/favorites/${toolId}`, {
+  const response = await fetch(`${API_URL}/usuarios/me/favorites/${toolId}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
       ...(token ? { "Authorization": `Bearer ${token}` } : {}),
     },
-  });
+  })
 
   if (!response.ok) {
-    throw new Error("Não foi possível remover a ferramenta dos favoritos.");
+    throw new Error("Não foi possível remover dos favoritos.")
   }
-}
 
+  if (response.status === 204) {
+    return true
+  }
+
+  return response.json()
+}
 // ============================================================
 // PERFIL DO USUÁRIO — /usuarios
 // ============================================================
@@ -556,6 +562,34 @@ export async function atualizarPerfilUsuario(userId: string, data: UserPerfilUpd
   }
 
   return response.json();
+}
+
+
+// ============================================================
+// BUSCAR (STARS)
+// ============================================================
+
+export async function getMyFavoriteIds(): Promise<number[]> {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
+  
+  if (!token) return [];
+
+  try {
+    const response = await fetch(`${baseUrl}/usuarios/me/favorites`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) return [];
+    const data = await response.json();
+    return data.ferramenta_ids || []; 
+  } catch {
+    return [];
+  }
 }
 
 // ============================================================

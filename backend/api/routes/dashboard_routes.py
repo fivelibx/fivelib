@@ -57,7 +57,7 @@ async def criar_link_privado(
  
 @router.delete("/private-links/{link_id}")
 async def deletar_link_privado(
-    link_id: int,  # Captura o ID da URL como inteiro
+    link_id: int,
     db: Client = Depends(get_supabase),
     user: dict = Depends(obter_usuario_atual)
 ):
@@ -65,3 +65,21 @@ async def deletar_link_privado(
     service = DashboardService(repository)
     service.delete_private_link(user_id=user["id"], link_id=link_id)
     return {"message": "Link privado removido com sucesso."}
+
+# ============================================================
+# REMOVER FAVORITO — USUÁRIO LOGADO
+# ============================================================
+
+@router.delete("/favorites/{tool_id}")
+async def deletar_favorito(
+    tool_id: int,
+    db: Client = Depends(get_supabase),
+    user: dict = Depends(obter_usuario_atual)
+):
+    repository = DashboardRepository(db)
+    service = DashboardService(repository)
+    
+    # Chama o método que você já tem no Service, sem alterar o nome dele
+    service.remove_tool_from_favorites(user_id=user["id"], tool_id=tool_id)
+    
+    return {"message": "Ferramenta removida dos favoritos com sucesso."}
