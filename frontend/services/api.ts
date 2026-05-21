@@ -353,11 +353,13 @@ export async function deletarLinkPrivado(linkId: number): Promise<void> {
 }
 
 export const removerFerramentaFavorita = async (toolId: number) => {
-  const response = await fetch(`http://localhost:8001/api/v1/usuarios/me/favorites/${toolId}`, {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  const response = await fetch(`${API_URL}/usuarios/me/favorites/${toolId}`, {
     method: "DELETE",
     headers: {
-      "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
       "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
     },
   })
 
@@ -365,7 +367,6 @@ export const removerFerramentaFavorita = async (toolId: number) => {
     throw new Error("Não foi possível remover dos favoritos.")
   }
 
-  // Se o status for 204, não tenta ler o JSON (evita o crash)
   if (response.status === 204) {
     return true
   }
