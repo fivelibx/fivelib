@@ -39,6 +39,7 @@ export default function DashboardPage() {
   const [submitLoading, setSubmitLoading] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [showSuccessToast, setShowSuccessToast] = useState(false)
 
   const [titulo, setTitulo] = useState("")
   const [url, setUrl] = useState("")
@@ -107,7 +108,14 @@ export default function DashboardPage() {
     try {
       await removerFerramentaFavorita(toolId)
       setFavoritos((prev) => prev.filter(item => item.id !== toolId))
+      
+      setShowSuccessToast(true)
+      
+      setTimeout(() => {
+        setShowSuccessToast(false)
+      }, 3000)
     } catch (err) {
+      console.error(err)
       alert("Não foi possível remover dos favoritos.")
     }
   }
@@ -126,7 +134,7 @@ export default function DashboardPage() {
     <div className="flex min-h-screen flex-col bg-background">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-7xl">
+      <main className="flex-1 container mx-auto px-4 py-8 max-w-7xl relative">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-foreground">
             Minha <span className="text-primary">Biblioteca</span>
@@ -372,6 +380,23 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Toast de Sucesso Animado */}
+        <div 
+          className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 bg-card border border-border p-4 rounded-xl shadow-2xl transition-all duration-300 transform ${
+            showSuccessToast 
+              ? "opacity-100 translate-y-0 scale-100" 
+              : "opacity-0 translate-y-4 scale-95 pointer-events-none"
+          }`}
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
+            <Trash2 className="h-4 w-4" />
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-foreground">Removido com sucesso</h4>
+            <p className="text-xs text-muted-foreground">A biblioteca saiu dos seus favoritos.</p>
+          </div>
+        </div>
       </main>
 
       <Footer />
