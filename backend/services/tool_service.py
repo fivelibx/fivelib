@@ -17,3 +17,14 @@ class ToolService:
         
         self.repository.update_stars(tool_id, new_stars)
         return new_stars
+    
+    def decrement_tool_stars(self, tool_id: int):
+        tool = self.repository.get_by_id(tool_id)
+        if not tool:
+            return None
+        
+        current_stars = tool.get("stars") or 0
+        new_stars = max(0, current_stars - 1)
+        
+        self.repository.update_stars(tool_id, new_stars)
+        return new_stars

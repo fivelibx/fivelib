@@ -67,13 +67,15 @@ export function Header({ isLoggedIn: initialIsLoggedIn = false, userName: initia
             Buscar
           </Link>
           {isLoggedIn && (
-            // 💡 AJUSTADO: Apontando para o diretório real /dashboard
             <Link href="/dashboard" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
               Minha Biblioteca
             </Link>
           )}
           <Link href="/suporte" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
             Suporte
+          </Link>
+          <Link href="/sobre" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+            Sobre
           </Link>
         </nav>
 

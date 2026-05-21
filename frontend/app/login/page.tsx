@@ -48,12 +48,13 @@ export default function LoginPage() {
 
     try {
       const data = await login({ email, password })
-
+      localStorage.setItem("fivelib_show_tour", "true")
       if (data.role === "admin") {
         router.push("/")
       } else {
         router.push("/")
       }
+      
     } catch (err: any) {
       const errStatus = err.status;
       const errData = err.data;

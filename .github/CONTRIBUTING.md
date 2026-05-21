@@ -52,13 +52,11 @@ Ao encontrar uma falha técnica, reporte-a seguindo este protocolo:
 
 ## Equipe e Contribuidores
 
-A tabela abaixo define os papéis técnicos e as áreas de responsabilidade no desenvolvimento do DevAcademicX.
+A governança e o desenvolvimento do FiveLib são liderados por **Lucas Paiva S. de Oliveira**. 
 
-| Nome                                 | Cargo / Título                       | Foco de Contribuição                                         |
-| ------------------------------------ | ------------------------------------- | -------------------------------------------------------------- |
-| **Lucas Paiva S. de Oliveira** | Lead Full Stack Developer & Architect | Arquitetura, Backend, Frontend, Infraestrutura, Documentação |
-| **Felipe Gonçalves**          | Frontend Developer                    | Frontend                                                       |
+| Nome | Cargo / Título | Foco de Contribuição |
+| :--- | :--- | :--- |
+| **Lucas Paiva S. de Oliveira** | Lead Full Stack Developer & Architect | Arquitetura, Core Backend, Frontend, Infraestrutura |
+| **Felipe Gonçalves** | Contributor | Lógica inicial de autenticação e interações (Stars/Favorites) |
 
----
-
-***Nota**: Se você deseja contribuir e ver seu nome nesta lista, siga rigorosamente as diretrizes definidas neste guia.*
+*Nota: As contribuições técnicas são avaliadas e integradas mediante conformidade com o nosso fluxo de trabalho.*

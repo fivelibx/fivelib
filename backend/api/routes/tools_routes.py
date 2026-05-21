@@ -83,3 +83,14 @@ async def delete_resource(
             status_code=status.HTTP_400_BAD_REQUEST, 
             detail=f"Erro na requisição de exclusão no banco: {str(e)}"
         )
+        
+@router.delete("/{tool_id}/star")
+async def remove_star(tool_id: int, db: Client = Depends(get_supabase)):
+    repository = ToolRepository(db)
+    service = ToolService(repository) 
+    
+    new_stars = service.decrement_tool_stars(tool_id)
+    if new_stars is None:
+        raise HTTPException(status_code=404, detail="Ferramenta não encontrada")
+        
+    return {"stars": new_stars}
