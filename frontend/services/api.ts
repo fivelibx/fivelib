@@ -352,22 +352,26 @@ export async function deletarLinkPrivado(linkId: number): Promise<void> {
   }
 }
 
-export async function removerFerramentaFavorita(toolId: number): Promise<void> {
-  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
-
-  const response = await fetch(`${API_URL}/dashboard/favorites/${toolId}`, {
+export const removerFerramentaFavorita = async (toolId: number) => {
+  const response = await fetch(`http://localhost:8001/api/v1/usuarios/me/favorites/${toolId}`, {
     method: "DELETE",
     headers: {
+      "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
       "Content-Type": "application/json",
-      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
     },
-  });
+  })
 
   if (!response.ok) {
-    throw new Error("Não foi possível remover a ferramenta dos favoritos.");
+    throw new Error("Não foi possível remover dos favoritos.")
   }
-}
 
+  // Se o status for 204, não tenta ler o JSON (evita o crash)
+  if (response.status === 204) {
+    return true
+  }
+
+  return response.json()
+}
 // ============================================================
 // PERFIL DO USUÁRIO — /usuarios
 // ============================================================
