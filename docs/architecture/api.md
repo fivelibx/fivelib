@@ -1,37 +1,59 @@
 
-# API Specification: FiveLib (v1.0 - Alinhada ao DB)
+# API Specification: FiveLib (v1.0.0 - Sincronizada ao DB)
 
- **Base URL** : `http://localhost:8000/api/v1`
+ **Base URL** : `http://localhost:8001/api/v1`
+
  **Content-Type** : `application/json`
-
----
 
 ## 1. Authentication (RF05, RN01, RN02)
 
-Responsável pelo controle de acesso e validação de maioridade.
+Controle de acesso, fluxos de verificação de conta, segurança e recuperação de senha.
 
 ### POST `/auth/register`
 
 Cadastra um novo usuário. Requer validação de +18 anos ( **RN01** ).
 
-* **Request Body** : **JSON**
+* Por padrão, a conta é criada com `is_active = false` e um código é gerado.
+* **Request Body (JSON)** :
+
+**JSON**
 
 ```
 {
   "nome": "string",
   "email": "string",
   "senha": "string",
-  "data_nascimento": "YYYY-MM-DD"
+  "data_nascimento": "YYYY-MM-DD",
+  "accepted_terms": true
 }
 ```
 
 * **Response** : `201 Created`
 
+### POST `/auth/verify`
+
+Ativa a conta do usuário usando o código enviado por e-mail.
+
+* **Request Body (JSON)** :
+
+**JSON**
+
+```
+{
+  "email": "string",
+  "verification_code": "string"
+}
+```
+
+* **Response** : `200 OK` -> Muta `is_active` para `true` no banco.
+
 ### POST `/auth/login`
 
-Autentica o usuário e retorna o token JWT.
+Autentica o usuário e retorna o token JWT. Só permite login se `is_active` for `true`.
 
-* **Request Body** : **JSON**
+* **Request Body (JSON)** :
+
+**JSON**
 
 ```
 {
@@ -42,49 +64,107 @@ Autentica o usuário e retorna o token JWT.
 
 * **Response** : `{ "access_token": "string", "token_type": "bearer" }`
 
----
+### POST `/auth/forgot-password`
 
-## 2. Resources (RF01, RF03)
+Solicita código de recuperação de senha.
 
-### GET `/resources`
+* **Request Body (JSON)** : `{ "email": "string" }`
+* **Response** : `200 OK`
 
-Lista ferramentas. Filtros baseados nas colunas da tabela `Tool`.
+### POST `/auth/reset-password`
 
-* **Query Params** : `q` (busca), `linguagem` (filtro), `categoria` (filtro).
-* **Response** : `200 OK` (Array de objetos `Tool`)
+Define uma nova senha utilizando o código de recuperação validado.
 
-### POST `/resources/{id}/report` (RF03)
+* **Request Body (JSON)** :
 
-Sinaliza instabilidade em uma ferramenta.
-
-* **Request Body** : **JSON**
+**JSON**
 
 ```
 {
-  "mensagem": "string",
-  "secao_site": "string"
+  "email": "string",
+  "reset_password_code": "string",
+  "nova_senha": "string"
 }
 ```
 
-* **Response** : `202 Accepted`
+* **Response** : `200 OK`
 
----
+## 2. Resources & Tools (RF01, RF03)
+
+### GET `/resources`
+
+Lista as ferramentas ativas cadastradas. Filtros estendidos baseados nas novas colunas do banco.
+
+* **Query Params** : `q` (busca no nome/descrição), `linguagem`, `categoria`, `tag`.
+* **Response** : `200 OK` (Array de objetos `Tool`)
+
+### POST `/resources` (Apenas Admin/Superadmin)
+
+Endpoint de cadastro de novas ferramentas (exige validação do campo `perfil` no JWT).
+
+* **Request Body (JSON)** :
+
+**JSON**
+
+```
+{
+  "nome": "string",
+  "descricao": "string",
+  "url_oficial": "string",
+  "linguagem": "string",
+  "categoria": "string",
+  "icon_slug": "string",
+  "tags": ["string"]
+}
+```
+
+* **Response** : `201 Created`
 
 ## 3. User Profile & Library (RF02, RF04)
 
+### GET `/users/me`
+
+Retorna o perfil detalhado do usuário logado baseado no token.
+
+* **Response** : `200 OK` (Retorna o DTO `User` completo, incluindo links sociais).
+
+### PUT `/users/me`
+
+Atualiza os dados complementares do perfil do usuário.
+
+* **Request Body (JSON)** :
+
+**JSON**
+
+```
+{
+  "nome": "string",
+  "titulo_profissional": "string",
+  "github": "string",
+  "linkedin": "string"
+}
+```
+
+* **Response** : `200 OK`
+
 ### GET `/users/me/favorites`
 
-Retorna os favoritos do usuário logado.
+Retorna a lista de ferramentas favoritadas pelo usuário (Join entre `favorite` e `tool`).
 
 ### POST `/users/me/favorites`
 
-* **Request Body** : `{ "ferramenta_id": 0 }` (Integer conforme `SERIAL` do DB).
+Favorita/Desfavorita uma ferramenta (Toggle).
+
+* **Request Body (JSON)** : `{ "ferramenta_id": 0 }`
+* **Response** : `200 OK` (Atualiza também o contador `stars` na tabela `tool`).
 
 ### POST `/users/me/custom-links` (RF04)
 
-Adiciona link privado (Tabela `PrivateLink`).
+Adiciona um link privado para a biblioteca do usuário.
 
-* **Request Body** : **JSON**
+* **Request Body (JSON)** :
+
+**JSON**
 
 ```
 {
@@ -93,15 +173,17 @@ Adiciona link privado (Tabela `PrivateLink`).
 }
 ```
 
----
+* **Response** : `201 Created`
 
-## 4. Support (RN04)
+## 4. Support & Tickets (RN04)
 
 ### POST `/support/tickets`
 
-Abertura de chamados (Tabela `SupportTicket`).
+Abertura de chamados ou reporte de instabilidade de ferramentas (Tabela `SupportTicket`).
 
-* **Request Body** : **JSON**
+* **Request Body (JSON)** :
+
+**JSON**
 
 ```
 {
@@ -111,24 +193,32 @@ Abertura de chamados (Tabela `SupportTicket`).
 }
 ```
 
-* **Response** : `201 Created` (Status padrão: `Pendente`)
+* **Response** : `201 Created` (Persiste com `status: "Pendente"`)
 
----
+### PATCH `/support/tickets/{id}` (Apenas Moderador/Admin)
 
-## 5. Modelos de Dados (DTOs/Schemas)
+Atualiza o status do ticket e adiciona observações técnicas.
 
-Alinhados com as definições do  **Dicionário de Dados** .
+* **Request Body (JSON)** :
 
-| Modelo                    | Campos principais                                                                 |
-| ------------------------- | --------------------------------------------------------------------------------- |
-| **Tool (Resource)** | `id`(int),`nome`,`descricao`,`url_oficial`,`linguagem`,`status_ativo` |
-| **User**            | `id`(int),`nome`,`email`,`perfil`,`data_nascimento`                     |
-| **Ticket**          | `id`(int),`usuario_id`,`status`,`mensagem`,`criado_at`                  |
+**JSON**
 
----
+```
+{
+  "status": "Resolvido",
+  "observacao_admin": "string"
+}
+```
 
-### Notas de Implementação
+* **Response** : `200 OK`
 
-1. **Sincronia de Idioma** : Note que mudamos de `full_name` para `nome` e `password` para `senha`. Isso evita que você tenha que mapear manualmente cada campo no seu Service do FastAPI.
-2. **Validação RN01** : O endpoint de registro agora envia a `data_nascimento`. No backend, basta um `if (hoje - data_nascimento) < 18: raise HTTPException`.
-3. **IDs** : Todos os IDs de referência foram alterados de `uuid` para `integer`, respeitando o tipo `SERIAL` do seu PostgreSQL.
+## 5. Modelos de Dados Atualizados (DTOs / Pydantic Schemas)
+
+Estes modelos refletem exatamente os tipos e restrições gerados no seu dump definitivo do banco.
+
+| **Modelo**      | **Campos e Tipos de Dados (Sincronizados ao DB)**                                                                                                                                                                                                               |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tool**        | `id`(int),`nome`(str),`descricao`(str),`url_oficial`(str),`linguagem`(str),`status_ativo`(bool),`stars`(int),`tags`(List[str]),`categoria`(str),`icon_slug`(str)                                                                                  |
+| **User**        | `id`(int),`nome`(str),`email`(str),`perfil`(str),`data_nascimento`(date),`is_active`(bool),`accepted_terms`(bool),`accepted_terms_at`(datetime),`titulo_profissional`(str/null),`github`(str/null),`linkedin`(str/null),`criado_at`(datetime) |
+| **Ticket**      | `id`(int),`usuario_id`(int),`email_contato`(str),`mensagem`(str),`secao_site`(str),`status`(str),`observacao_admin`(str/null),`criado_at`(datetime)                                                                                                   |
+| **PrivateLink** | `id`(int),`usuario_id`(int),`titulo`(str),`url`(str)                                                                                                                                                                                                          |

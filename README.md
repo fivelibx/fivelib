@@ -20,7 +20,7 @@
 
 O FiveLib é uma **plataforma web de curadoria e organização** focada em centralizar conteúdos, ferramentas e bibliotecas essenciais para iniciantes na área de programação, reduzindo a sobrecarga de informação através de uma arquitetura limpa e escalável.
 
-Se você considera este repositório útil para seus estudos ou projetos, por favor considere dar um Star no projeto.
+Se você considera este repositório útil para seus estudos ou projetos, por favor considere dar um **Star** no projeto.
 
 ## Como Executar
 
