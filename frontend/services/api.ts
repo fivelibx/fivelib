@@ -1,6 +1,6 @@
 //import { AuthResponse } from './api';
 const DEFAULT_API_URL = 'http://localhost:8001/api/v1';
-const API_URL = process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_URL;
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || DEFAULT_API_URL;
 
 // ============================================================
 // INTERFACES — TIPOS E MODELOS DE DADOS
