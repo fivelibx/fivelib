@@ -17,7 +17,7 @@ import {
 } from "@/services/api"
 import { 
   Plus, 
-  Star, 
+  Heart, 
   Link2, 
   Trash2, 
   ExternalLink, 
@@ -30,7 +30,7 @@ import {
 } from "lucide-react"
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<"favoritos" | "privados">("favoritos")
+  const [activeTab, setActiveTab] = useState<"salvas" | "privados">("salvas")
   const [favoritos, setFavoritos] = useState<Tool[]>([])
   const [linksPrivados, setLinksPrivados] = useState<PrivateLink[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -100,7 +100,7 @@ export default function DashboardPage() {
       await deletarLinkPrivado(id)
       setLinksPrivados((prev) => prev.filter(item => item.id !== id))
     } catch (err) {
-      alert("Não foi possível remover o link privado.")
+      alert("Não foi possível remover the link privado.")
     }
   }
 
@@ -116,7 +116,7 @@ export default function DashboardPage() {
       }, 3000)
     } catch (err) {
       console.error(err)
-      alert("Não foi possível remover dos favoritos.")
+      alert("Não foi possível remover as tecnologias salvas.")
     }
   }
 
@@ -140,7 +140,7 @@ export default function DashboardPage() {
             Minha <span className="text-primary">Biblioteca</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Gerencie seus favoritos e links privados
+            Gerencie suas tecnologias salvas e links privados de estudo
           </p>
         </div>
 
@@ -148,11 +148,11 @@ export default function DashboardPage() {
           <Card className="bg-card border-border">
             <CardContent className="p-6 flex items-center gap-4">
               <div className="p-3 rounded-lg bg-destructive/10 text-destructive">
-                <Star className="h-5 w-5 fill-current" />
+                <Heart className="h-5 w-5 fill-current" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">{favoritos.length}</p>
-                <p className="text-xs text-muted-foreground">Favoritos</p>
+                <p className="text-xs text-muted-foreground">Tecnologias Salvas</p>
               </div>
             </CardContent>
           </Card>
@@ -202,15 +202,15 @@ export default function DashboardPage() {
 
         <div className="flex gap-2 border-b border-border mb-6">
           <button
-            onClick={() => setActiveTab("favoritos")}
+            onClick={() => setActiveTab("salvas")}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${
-              activeTab === "favoritos"
+              activeTab === "salvas"
                 ? "border-primary text-primary"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Star className="h-4 w-4" />
-            Favoritos ({favoritosFiltrados.length})
+            <Heart className="h-4 w-4" />
+            Tecnologias Salvas ({favoritosFiltrados.length})
           </button>
           <button
             onClick={() => setActiveTab("privados")}
@@ -230,10 +230,10 @@ export default function DashboardPage() {
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-sm text-muted-foreground">Sincronizando biblioteca...</p>
           </div>
-        ) : activeTab === "favoritos" ? (
+        ) : activeTab === "salvas" ? (
           favoritosFiltrados.length === 0 ? (
             <div className="text-center py-12 border border-dashed border-border rounded-lg text-muted-foreground text-sm">
-              Nenhuma ferramenta encontrada nos favoritos.
+              Nenhuma ferramenta encontrada nas tecnologias salvas.
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -394,7 +394,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <h4 className="text-sm font-semibold text-foreground">Removido com sucesso</h4>
-            <p className="text-xs text-muted-foreground">A biblioteca saiu dos seus favoritos.</p>
+            <p className="text-xs text-muted-foreground">A biblioteca saiu das suas tecnologias salvas.</p>
           </div>
         </div>
       </main>

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Eye, Save, Loader2, AlertCircle, CheckCircle2, RefreshCw, ExternalLink, Trash2 } from "lucide-react"
+import { API_URL } from "@/services/api"
 
 interface Ferramenta {
   id: string | number
@@ -52,7 +53,7 @@ export default function GestaoFerramentas() {
       const role = localStorage.getItem("user_role")
       setUserRole(role)
 
-      const res = await fetch("http://localhost:8001/api/v1/resources/", {
+      const res = await fetch(`${API_URL}/resources/`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`
@@ -103,7 +104,7 @@ export default function GestaoFerramentas() {
 
       const token = localStorage.getItem("access_token")
       
-      const res = await fetch("http://localhost:8001/api/v1/resources/", {
+      const res = await fetch(`${API_URL}/resources/`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -136,24 +137,18 @@ export default function GestaoFerramentas() {
   }
 
   const handleDeletar = async (resourceId: string | number) => {
-    console.log("-> Função handleDeletar acionada no Front com ID:", resourceId)
-
     try {
       setDeletingId(resourceId)
 
       const token = localStorage.getItem("access_token")
       const idNumerico = Number(resourceId)
       
-      console.log(`-> Enviando requisição DELETE para: http://localhost:8001/api/v1/resources/${idNumerico}`)
-
-      const res = await fetch(`http://localhost:8001/api/v1/resources/${idNumerico}`, {
+      const res = await fetch(`${API_URL}/resources/${idNumerico}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`
         }
       })
-
-      console.log("-> Status retornado pelo backend:", res.status)
 
       if (!res.ok) {
         const erroDados = await res.json()
@@ -164,7 +159,6 @@ export default function GestaoFerramentas() {
       carregarFerramentas() 
 
     } catch (err: any) {
-      console.error("❌ Erro capturado na exclusão:", err)
       alert(err.message || "Erro ao tentar conectar com o servidor.")
     } finally {
       setDeletingId(null)
