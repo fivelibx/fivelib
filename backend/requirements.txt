@@ -21,7 +21,7 @@ gitdb2==4.0.2
 GitPython==3.0.6
 greenlet==3.5.0
 h11==0.16.0
-h2==4.3.0
+h2==4.4.1
 hpack==4.1.0
 httpcore==1.0.9
 httpx==0.28.1
